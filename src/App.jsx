@@ -1,14 +1,21 @@
 import "./App.css";
 import Navbar from "./component/common/Navbar";
-import { Route, Routes } from "react-router-dom";
-import Home from "./component/page/Home";
+import { Route, Routes, useLocation } from "react-router-dom";
+import HomePage from "./component/page/Home/HomePage";
+import LoginPage from "./component/page/Login/LoginPage";
+
+const isNoNavbarPaths = ["/sign-in", "/sign-up"];
 
 function App() {
+  const location = useLocation();
+  const isNoNavbar = isNoNavbarPaths.includes(location.pathname);
+
   return (
     <>
-      <Navbar />
+      {!isNoNavbar && <Navbar />}
       <Routes>
-        <Route path="/" element={<Home />}></Route>
+        <Route path="/sign-in" element={<LoginPage />} />
+        <Route path="/" element={<HomePage />} />
       </Routes>
     </>
   );
