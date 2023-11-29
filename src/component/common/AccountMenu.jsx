@@ -8,30 +8,42 @@ import {
   ListItem,
   ListItemPrefix,
 } from "@material-tailwind/react";
+import { useContext } from "react";
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 function AccountMenu() {
+  const { user, logout } = useContext(AuthContext);
+
+  function handleSignout() {
+    logout();
+  }
+
   return (
     <Popover placement="bottom-end">
       <PopoverHandler>
         <button>
-          <Avatar className="bg-indigo-500" src="" size="sm"></Avatar>
+          <Avatar
+            className="bg-indigo-500"
+            src={user?.image}
+            size="sm"
+          ></Avatar>
         </button>
       </PopoverHandler>
       <PopoverContent className="w-72">
         <div className="mb-4 flex items-center gap-4 border-b border-blue-gray-50 pb-4">
-          <Avatar src="https://docs.material-tailwind.com/img/team-4.jpg" />
+          <Avatar src={user?.image} />
           <div>
             <Typography variant="h6" color="blue-gray">
-              Tania Andrew
+              {user?.full_name}
             </Typography>
             <Typography
               variant="small"
               color="gray"
               className="font-medium text-blue-gray-500"
             >
-              hienthai@gmail.com
+              {user?.email}
             </Typography>
           </div>
         </div>
@@ -47,9 +59,9 @@ function AccountMenu() {
               My Account
             </ListItem>
           </Link>
-          <Link
-            to="/logout"
+          <button
             className="text-initial font-medium text-blue-gray-500"
+            onClick={handleSignout}
           >
             <ListItem>
               <ListItemPrefix>
@@ -57,7 +69,7 @@ function AccountMenu() {
               </ListItemPrefix>
               Sign Out
             </ListItem>
-          </Link>
+          </button>
         </List>
       </PopoverContent>
     </Popover>

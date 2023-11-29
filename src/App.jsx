@@ -1,21 +1,53 @@
 import "./App.css";
 import Navbar from "./component/common/Navbar";
-import { Route, Routes, useLocation } from "react-router-dom";
-import HomePage from "./component/page/Home/HomePage";
-import LoginPage from "./component/page/Login/LoginPage";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import HomePage from "./page/Home/HomePage";
+import LoginPage from "./page/Login/LoginPage";
+import VerificationPage from "./page/Verification/VerificationPage";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContext";
 
-const isNoNavbarPaths = ["/sign-in", "/sign-up"];
+function PrivatePage({ element }) {
+  const { user } = useContext(AuthContext);
+  const path = useLocation().pathname;
+
+  if (user == null) {
+    return <Navigate to="/sign-in" />;
+  } else if (!user.is_verified) {
+    return path == "/verification" ? (
+      <VerificationPage />
+    ) : (
+      <Navigate to="/verification" />
+    );
+  }
+
+  return element;
+}
+
+function PublicPage({ element, restricted }) {
+  restricted = restricted || false;
+  const { user } = useContext(AuthContext);
+
+  return restricted && user != null ? <Navigate to="/" /> : element;
+}
 
 function App() {
-  const location = useLocation();
-  const isNoNavbar = isNoNavbarPaths.includes(location.pathname);
+  const isNoNavbarPaths = ["/sign-in", "/sign-up", "/verification"];
+  const isNoNavbar = isNoNavbarPaths.includes(useLocation().pathname);
 
   return (
     <>
       {!isNoNavbar && <Navbar />}
       <Routes>
-        <Route path="/sign-in" element={<LoginPage />} />
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/sign-in"
+          element={<PublicPage element={<LoginPage />} />}
+        />
+        <Route
+          path="/verification"
+          element={<PrivatePage element={<VerificationPage />} />}
+        />
+        <Route path="/" element={<PrivatePage element={<HomePage />} />} />
       </Routes>
     </>
   );

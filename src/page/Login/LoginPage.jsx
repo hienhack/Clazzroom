@@ -1,16 +1,53 @@
 import { Button, Input } from "@material-tailwind/react";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useState } from "react";
 import { FaGooglePlusSquare, FaFacebookSquare } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
-
-function onSubmit(data) {
-  // sendata to login
-}
+import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
 function LoginPage() {
   const [error, setError] = useState();
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  function onSubmit(data) {
+    // axios
+    //   .post("/user/login", {
+    //     username: data.email,
+    //     password: data.password,
+    //   })
+    //   .then((res) => {
+    //     login(res.data.data);
+    //   })
+    //   .catch((error) => {
+    //     setError(error.response.message);
+    //   });
+
+    const testUser = {
+      is_verified: false,
+      image:
+        "https://afamilycdn.com/150157425591193600/2023/7/10/3581026861353491429191131976811112986346003n-168896101713887268472.jpg",
+      full_name: "Hien Thai",
+      email: "hienthai@gmail.com",
+      is_verified: false,
+    };
+
+    login({
+      token: "asdfasdfasdfsf",
+      user: testUser,
+    });
+
+    navigate("/");
+  }
+
+  function oauthLogin(method, id) {}
+
+  function handleFacebookLogin() {}
+
+  function handleGoolgeLogin() {}
+
   const {
     register,
     handleSubmit,
@@ -24,8 +61,6 @@ function LoginPage() {
     reValidateMode: "onBlur",
   });
 
-  console.log("re-render");
-
   return (
     <div className="min-h-screen bg-indigo-50 py-20">
       <div className="w-4/12 bg-white shadow-sm rounded-xl p-12 mx-auto">
@@ -33,6 +68,9 @@ function LoginPage() {
           <h1 className="text-center font-extrabold text-3xl mt-5 mb-9 text-blue-gray-800">
             Sign in
           </h1>
+          {error && (
+            <h6 className="text-red-600 text-sm italic mb-5">{error}</h6>
+          )}
           <div className="flex flex-col gap-8">
             <div>
               <Input
