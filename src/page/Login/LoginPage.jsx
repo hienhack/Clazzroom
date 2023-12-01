@@ -69,7 +69,7 @@ function LoginPage() {
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: tokenResponse => {
-      fetch('https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + tokenResponse.access_token)
+      fetch(token_url + tokenResponse.access_token)
         .then(response => response.json())
         .then(data => {
           const {
