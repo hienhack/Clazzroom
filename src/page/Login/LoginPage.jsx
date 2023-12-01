@@ -27,8 +27,7 @@ function LoginPage() {
     axios
       .post(url, data)
       .then((res) => {
-        console.log(res);
-        loginToContext(res.data.data);
+        loginToContext(res.data);
         navigate("/");
       })
       .catch((error) => {

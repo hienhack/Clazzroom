@@ -1,5 +1,6 @@
 import axios from "axios";
 import { createContext, useCallback, useEffect, useState } from "react";
+import { ErrorMessage } from "@hookform/error-message";
 
 const AuthContext = createContext();
 
@@ -7,9 +8,18 @@ function AuthProvider({ children }) {
   const [user, setUser] = useState();
   //   const [user, setUser] = useState(testUser);
 
-  const login = useCallback((loginData) => {
+  const login = useCallback((loginData, errorHandler) => {
     localStorage.setItem("token", loginData.token);
-    setUser(loginData.user);
+    axios
+      .get("/users/profile", loginData.token)
+      .then((res) => {
+        setUser(res.data.data);
+      })
+      .catch((error) => {
+        if (!errorHandler) return;
+        errorHandler(error);
+      });
+
   }, []);
 
   const logout = useCallback(() => {
