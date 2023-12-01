@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { ErrorMessage } from "@hookform/error-message";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const AuthContext = createContext();
 
@@ -51,9 +52,11 @@ function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ login, logout, setUser, user }}>
-      {children}
-    </AuthContext.Provider>
+    <GoogleOAuthProvider clientId="808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com">
+      <AuthContext.Provider value={{ login, logout, setUser, user }}>
+        {children}
+      </AuthContext.Provider>
+    </GoogleOAuthProvider>
   );
 }
 

@@ -8,12 +8,15 @@ import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import MoreInfoForm from "./MoreInfoForm";
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
+import { useGoogleLogin } from '@react-oauth/google';
 
 const LOGIN_METHOD_URL = {
   facebook: "/users/facebook-oauth",
   google: "/users/google-oauth",
   basic: "/users/login",
 };
+
+const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
@@ -64,7 +67,28 @@ function LoginPage() {
     }
   }
 
-  function handleGoogleLogin() { }
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: tokenResponse => {
+      fetch('https://www.googleapis.com/oauth2/v1/userinfo?access_token=' + tokenResponse.access_token)
+        .then(response => response.json())
+        .then(data => {
+          const {
+            id: gg_id,
+            name: full_name,
+            email,
+            picture: image,
+          } = data;
+          login("google", { gg_id }, (error) => {
+            if (error?.response?.status === 401) {
+              const user = { gg_id, full_name, email, image };
+              setLoadeUser(user);
+              setRegisterNeeded(true);
+            }
+          });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  });
 
   function handleCancelRegistor() {
     setRegisterNeeded(false);
@@ -171,7 +195,7 @@ function LoginPage() {
                 <hr className="grow border-blue-gray-200" />
               </div>
               <div className="grid grid-cols-2  gap-3">
-                <button className="flex items-center justify-center gap-2 p-2 border border-red-800 text-red-800 rounded-lg">
+                <button className="flex items-center justify-center gap-2 p-2 border border-red-800 text-red-800 rounded-lg" onClick={() => handleGoogleLogin()}>
                   <FaGooglePlusSquare size="1.5rem" />
                   <span className="text-base font-bold">Google</span>
                 </button>
