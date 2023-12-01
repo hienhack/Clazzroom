@@ -7,6 +7,7 @@ import { ErrorMessage } from "@hookform/error-message";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import MoreInfoForm from "./MoreInfoForm";
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
 
 const LOGIN_METHOD_URL = {
   facebook: "/users/facebook-oauth",
@@ -26,6 +27,7 @@ function LoginPage() {
     axios
       .post(url, data)
       .then((res) => {
+        console.log(res);
         loginToContext(res.data.data);
         navigate("/");
       })
@@ -41,25 +43,29 @@ function LoginPage() {
     });
   }
 
-  function handleFacebookLogin() {
-    // This is just a test user
-    // You need to get the user from facebook oauth api
-    let user = {
-      fb_id: "adfasdfasdf",
-      full_name: "banc adsf ads",
-      email: "abc@gmail.com",
-      image: "abc.png",
-    };
-
-    login("facebook", { fb_id: user.fb_id }, (error) => {
-      if (error.response.status === 401) {
-        setLoadeUser(user);
-        setRegisterNeeded(true);
-      }
-    });
+  function handleFacebookLogin(response) {
+    if (response?.accessToken) {
+      const {
+        userID: fb_id,
+        name: full_name,
+        email,
+        picture: {
+          data: { url: image },
+        },
+      } = response;
+      login("facebook", { fb_id }, (error) => {
+        if (error?.response?.status === 401) {
+          const user = { fb_id, full_name, email, image };
+          setLoadeUser(user);
+          setRegisterNeeded(true);
+        }
+      });
+    } else {
+      console.log("Facebook login failed");
+    }
   }
 
-  function handleGoogleLogin() {}
+  function handleGoogleLogin() { }
 
   function handleCancelRegistor() {
     setRegisterNeeded(false);
@@ -170,13 +176,21 @@ function LoginPage() {
                   <FaGooglePlusSquare size="1.5rem" />
                   <span className="text-base font-bold">Google</span>
                 </button>
-                <button
-                  onClick={handleFacebookLogin}
-                  className="flex items-center justify-center gap-2 p-2 border border-blue-800 text-blue-800 rounded-lg"
-                >
-                  <FaFacebookSquare size="1.5rem" />
-                  <span className="text-base font-bold">Facebook</span>
-                </button>
+                <FacebookLogin
+                  appId="2580168245493289"
+                  autoLoad={false}
+                  fields="name,email,picture"
+                  callback={handleFacebookLogin}
+                  render={(renderProps) => (
+                    <button
+                      onClick={renderProps.onClick}
+                      className="flex items-center justify-center gap-2 p-2 border border-blue-800 text-blue-800 rounded-lg"
+                    >
+                      <FaFacebookSquare size="1.5rem" />
+                      <span className="text-base font-bold">Facebook</span>
+                    </button>
+                  )}
+                />
               </div>
               <div className="mt-10 flex gap-2 items-center">
                 <h1 className="text-sm text-gray-700">
