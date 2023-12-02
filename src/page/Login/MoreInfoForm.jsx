@@ -36,7 +36,7 @@ function MoreInfoForm({ user, login, handleCancel }) {
 
   return (
     <>
-      <h1 className=" text-blue-gray-900 font-extrabold text-3xl mt-5 mb-9">
+      <h1 className=" text-blue-gray-900 font-extrabold text-3xl mt-5 mb-14">
         {user.email ? "Email confirmation" : "Email needed"}
       </h1>
       <h6 className="text-sm text-blue-gray-700 text-justify mb-5">
