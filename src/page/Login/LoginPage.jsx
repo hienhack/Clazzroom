@@ -20,6 +20,8 @@ const LOGIN_METHOD_URL = {
   basic: "/users/login",
 };
 
+const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
+
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
   const [loadedUser, setLoadeUser] = useState();
@@ -69,22 +71,49 @@ function LoginPage() {
     }
   }
 
-  function handleGoogleLogin(response) {
-    const {
-      sub: gg_id,
-      name: full_name,
-      email,
-      picture: {
-        data: { url: image },
+  async function handleGoogleLogin(response) {
+    const tokenEndpoint = 'https://oauth2.googleapis.com/token';
+    const clientId = '808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com';
+    const clientSecret = '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';
+    const redirectUri = 'http://localhost:5173';
+
+    const requestBody = {
+      code: response.code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code'
+    };
+
+    await fetch(tokenEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
       },
-    } = response;
-    login("google", { gg_id }, (error) => {
-      if (error?.response?.status === 401) {
-        const user = { gg_id, full_name, email, image };
-        setLoadeUser(user);
-        setRegisterNeeded(true);
-      }
-    });
+      body: new URLSearchParams(requestBody)
+    })
+      .then(response => response.json())
+      .then(data => {
+        fetch(token_url + data.access_token)
+          .then(response => response.json())
+          .then(data => {
+            const {
+              id: gg_id,
+              name: full_name,
+              email,
+              picture: image,
+            } = data;
+            login("google", { gg_id }, (error) => {
+              if (error?.response?.status === 401) {
+                const user = { gg_id, full_name, email, image };
+                setLoadeUser(user);
+                setRegisterNeeded(true);
+              }
+            });
+          })
+          .catch(error => console.error('Error:', error));
+      })
+      .catch(error => console.error('Error:', error));
   }
 
   function handleCancelRegistor() {
@@ -194,8 +223,10 @@ function LoginPage() {
               <div className="grid grid-cols-2  gap-3">
                 <LoginSocialGoogle
                   client_id="808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com"
-                  onResolve={(response) => {
-                    handleGoogleLogin(response.data);
+                  discoveryDocs="claims_supported"
+                  access_type="offline"
+                  onResolve={({ provider, data }) => {
+                    handleGoogleLogin(data);
                   }}
                   onReject={(error) => {
                     console.log(error);
