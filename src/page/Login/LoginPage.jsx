@@ -1,18 +1,15 @@
 import { Button, Input } from "@material-tailwind/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
-import { FaGooglePlusSquare, FaFacebookSquare } from "react-icons/fa";
+import { FaFacebook, FaGoogle } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import MoreInfoForm from "./MoreInfoForm";
-// import { useGoogleLogin } from '@react-oauth/google';
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
 
-import MyFacebookLoginButton from "./MyFacebookLoginButton";
-import MyGoogleLoginButton from "./MyGoogleLoginButton";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
 const LOGIN_METHOD_URL = {
@@ -231,7 +228,10 @@ function LoginPage() {
                     console.log(error);
                   }}
                 >
-                  <MyGoogleLoginButton></MyGoogleLoginButton>
+                  <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800">
+                    <FaGoogle size="1.2rem" className="fill-inherit" />
+                    <span>Google</span>
+                  </button>
                 </LoginSocialGoogle>
                 <LoginSocialFacebook
                   appId="2580168245493289"
@@ -243,7 +243,10 @@ function LoginPage() {
                     console.log(error);
                   }}
                 >
-                  <MyFacebookLoginButton></MyFacebookLoginButton>
+                  <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
+                    <FaFacebook size="1.2rem" className="fill-inherit" />
+                    <span>Facebook</span>
+                  </button>
                 </LoginSocialFacebook>
               </div>
               <div className="mt-10 flex gap-2 items-center">
