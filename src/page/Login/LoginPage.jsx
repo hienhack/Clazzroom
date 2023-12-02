@@ -7,16 +7,18 @@ import { ErrorMessage } from "@hookform/error-message";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 import MoreInfoForm from "./MoreInfoForm";
-import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props'
-import { useGoogleLogin } from '@react-oauth/google';
+// import { useGoogleLogin } from '@react-oauth/google';
+import { LoginSocialFacebook } from "reactjs-social-login";
+import { LoginSocialGoogle } from "reactjs-social-login";
+
+import MyFacebookLoginButton from "./MyFacebookLoginButton";
+import MyGoogleLoginButton from "./MyGoogleLoginButton";
 
 const LOGIN_METHOD_URL = {
   facebook: "/users/facebook-oauth",
   google: "/users/google-oauth",
   basic: "/users/login",
 };
-
-const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
@@ -67,28 +69,23 @@ function LoginPage() {
     }
   }
 
-  const handleGoogleLogin = useGoogleLogin({
-    onSuccess: tokenResponse => {
-      fetch(token_url + tokenResponse.access_token)
-        .then(response => response.json())
-        .then(data => {
-          const {
-            id: gg_id,
-            name: full_name,
-            email,
-            picture: image,
-          } = data;
-          login("google", { gg_id }, (error) => {
-            if (error?.response?.status === 401) {
-              const user = { gg_id, full_name, email, image };
-              setLoadeUser(user);
-              setRegisterNeeded(true);
-            }
-          });
-        })
-        .catch(error => console.error('Error:', error));
-    }
-  });
+  function handleGoogleLogin(response) {
+    const {
+      sub: gg_id,
+      name: full_name,
+      email,
+      picture: {
+        data: { url: image },
+      },
+    } = response;
+    login("google", { gg_id }, (error) => {
+      if (error?.response?.status === 401) {
+        const user = { gg_id, full_name, email, image };
+        setLoadeUser(user);
+        setRegisterNeeded(true);
+      }
+    });
+  }
 
   function handleCancelRegistor() {
     setRegisterNeeded(false);
@@ -195,25 +192,29 @@ function LoginPage() {
                 <hr className="grow border-blue-gray-200" />
               </div>
               <div className="grid grid-cols-2  gap-3">
-                <button className="flex items-center justify-center gap-2 p-2 border border-red-800 text-red-800 rounded-lg" onClick={() => handleGoogleLogin()}>
-                  <FaGooglePlusSquare size="1.5rem" />
-                  <span className="text-base font-bold">Google</span>
-                </button>
-                <FacebookLogin
+                <LoginSocialGoogle
+                  client_id="808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com"
+                  onResolve={(response) => {
+                    handleGoogleLogin(response.data);
+                  }}
+                  onReject={(error) => {
+                    console.log(error);
+                  }}
+                >
+                  <MyGoogleLoginButton></MyGoogleLoginButton>
+                </LoginSocialGoogle>
+                <LoginSocialFacebook
                   appId="2580168245493289"
-                  autoLoad={false}
                   fields="name,email,picture"
-                  callback={handleFacebookLogin}
-                  render={(renderProps) => (
-                    <button
-                      onClick={renderProps.onClick}
-                      className="flex items-center justify-center gap-2 p-2 border border-blue-800 text-blue-800 rounded-lg"
-                    >
-                      <FaFacebookSquare size="1.5rem" />
-                      <span className="text-base font-bold">Facebook</span>
-                    </button>
-                  )}
-                />
+                  onResolve={(response) => {
+                    handleFacebookLogin(response.data);
+                  }}
+                  onReject={(error) => {
+                    console.log(error);
+                  }}
+                >
+                  <MyFacebookLoginButton></MyFacebookLoginButton>
+                </LoginSocialFacebook>
               </div>
               <div className="mt-10 flex gap-2 items-center">
                 <h1 className="text-sm text-gray-700">
