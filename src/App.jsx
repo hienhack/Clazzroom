@@ -6,6 +6,7 @@ import LoginPage from "./page/Login/LoginPage";
 import VerificationPage from "./page/Verification/VerificationPage";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContext";
+import RegisterPage from "./page/Register/RegisterPage";
 
 function PrivatePage({ element }) {
   const { user } = useContext(AuthContext);
@@ -42,6 +43,10 @@ function App() {
         <Route
           path="/sign-in"
           element={<PublicPage element={<LoginPage />} />}
+        />
+        <Route
+          path="/sign-up"
+          element={<PublicPage element={<RegisterPage />} />}
         />
         <Route
           path="/verification"
