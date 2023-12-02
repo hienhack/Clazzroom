@@ -7,16 +7,11 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 
 function VerificationPage() {
-  const { setUser } = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   // const { user } = useContext(AuthContext);
 
   // test user
-  const user = {
-    is_verified: false,
-    image: "",
-    full_name: "Hien Thai",
-    email: "hienthai@gmail.com",
-  };
+
 
   const { search } = useLocation();
   const token = new URLSearchParams(search).get("token_id");
@@ -58,7 +53,7 @@ function VerificationPage() {
       .then(() => {
         setSending(false);
       })
-      .catch((error) => {});
+      .catch((error) => { });
   }
 
   return (

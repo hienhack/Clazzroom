@@ -22,6 +22,8 @@ const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
+  const { setUser } = useContext(AuthContext);
+
   const [loadedUser, setLoadeUser] = useState();
   const [forgotPw, setForgotPw] = useState(false);
   const [error, setError] = useState();
@@ -61,7 +63,7 @@ function LoginPage() {
       login("facebook", { fb_id }, (error) => {
         if (error?.response?.status === 401) {
           const user = { fb_id, full_name, email, image };
-          setLoadeUser(user);
+          setUser(user);
           setRegisterNeeded(true);
         }
       });
@@ -101,7 +103,7 @@ function LoginPage() {
             login("google", { gg_id }, (error) => {
               if (error?.response?.status === 401) {
                 const user = { gg_id, full_name, email, image };
-                setLoadeUser(user);
+                setUser(user);
                 setRegisterNeeded(true);
               }
             });
@@ -266,7 +268,6 @@ function LoginPage() {
           )}
           {registerNeeded && (
             <MoreInfoForm
-              user={loadedUser}
               login={login}
               handleCancel={handleCancelRegistor}
             />
