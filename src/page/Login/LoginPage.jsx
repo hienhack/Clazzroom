@@ -13,6 +13,7 @@ import { LoginSocialGoogle } from "reactjs-social-login";
 
 import MyFacebookLoginButton from "./MyFacebookLoginButton";
 import MyGoogleLoginButton from "./MyGoogleLoginButton";
+import ForgotPasswordForm from "./ForgotPasswordForm";
 
 const LOGIN_METHOD_URL = {
   facebook: "/users/facebook-oauth",
@@ -25,6 +26,7 @@ const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
   const [loadedUser, setLoadeUser] = useState();
+  const [forgotPw, setForgotPw] = useState(false);
   const [error, setError] = useState();
   const { login: loginToContext } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -72,37 +74,33 @@ function LoginPage() {
   }
 
   async function handleGoogleLogin(response) {
-    const tokenEndpoint = 'https://oauth2.googleapis.com/token';
-    const clientId = '808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com';
-    const clientSecret = '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';
-    const redirectUri = 'http://localhost:5173';
+    const tokenEndpoint = "https://oauth2.googleapis.com/token";
+    const clientId =
+      "808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com";
+    const clientSecret = "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";
+    const redirectUri = "http://localhost:5173";
 
     const requestBody = {
       code: response.code,
       client_id: clientId,
       client_secret: clientSecret,
       redirect_uri: redirectUri,
-      grant_type: 'authorization_code'
+      grant_type: "authorization_code",
     };
 
     await fetch(tokenEndpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams(requestBody)
+      body: new URLSearchParams(requestBody),
     })
-      .then(response => response.json())
-      .then(data => {
+      .then((response) => response.json())
+      .then((data) => {
         fetch(token_url + data.access_token)
-          .then(response => response.json())
-          .then(data => {
-            const {
-              id: gg_id,
-              name: full_name,
-              email,
-              picture: image,
-            } = data;
+          .then((response) => response.json())
+          .then((data) => {
+            const { id: gg_id, name: full_name, email, picture: image } = data;
             login("google", { gg_id }, (error) => {
               if (error?.response?.status === 401) {
                 const user = { gg_id, full_name, email, image };
@@ -111,9 +109,9 @@ function LoginPage() {
               }
             });
           })
-          .catch(error => console.error('Error:', error));
+          .catch((error) => console.error("Error:", error));
       })
-      .catch(error => console.error('Error:', error));
+      .catch((error) => console.error("Error:", error));
   }
 
   function handleCancelRegistor() {
@@ -138,7 +136,7 @@ function LoginPage() {
     <>
       <div className="min-h-screen bg-indigo-50 py-20">
         <div className="w-4/12 bg-white shadow-sm rounded-xl p-12 mx-auto">
-          {!registerNeeded && (
+          {!registerNeeded && !forgotPw && (
             <>
               <h1 className="text-center text-blue-gray-900 font-extrabold text-3xl mt-5 mb-9">
                 Sign in
@@ -202,6 +200,7 @@ function LoginPage() {
                       <button
                         type="button"
                         className="mt-2 block float-right text-xs text-blue-gray-400 hover:text-blue-gray-700"
+                        onClick={() => setForgotPw(true)}
                       >
                         Forgot your password?
                       </button>
@@ -267,6 +266,13 @@ function LoginPage() {
               user={loadedUser}
               login={login}
               handleCancel={handleCancelRegistor}
+            />
+          )}
+          {forgotPw && (
+            <ForgotPasswordForm
+              onBack={() => {
+                setForgotPw(false);
+              }}
             />
           )}
         </div>
