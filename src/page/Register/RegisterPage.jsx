@@ -1,12 +1,16 @@
 import { ErrorMessage } from "@hookform/error-message";
 import { Button, Input } from "@material-tailwind/react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { AuthContext } from "../../context/AuthContext";
 
 function RegisterPage() {
   const [error, setError] = useState();
   const [processing, setProcessing] = useState(false);
+  const navigate = useNavigate();
+  const { setUser } = useContext(AuthContext);
 
   function onSubmit(data) {
     setProcessing(true);
@@ -16,6 +20,19 @@ function RegisterPage() {
     // Call api to register here
     // Success: nagigate to login
     // Failed: setError(error message);
+    axios
+      .post("users/register", newUser)
+      .then((res) => {
+        setUser(newUser);
+        navigate("/verification");
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+
   }
 
   const {
