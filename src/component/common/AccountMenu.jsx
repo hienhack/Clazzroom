@@ -9,8 +9,7 @@ import {
   ListItemPrefix,
 } from "@material-tailwind/react";
 import { useContext } from "react";
-import { FaUserCircle, FaSignOutAlt, FaRegUserCircle } from "react-icons/fa";
-import { PiSignOutFill } from "react-icons/pi";
+import { FaUserCircle } from "react-icons/fa";
 import { PiSignOutBold } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -27,18 +26,17 @@ function AccountMenu() {
       <PopoverHandler>
         <button>
           <Avatar
-            className="bg-indigo-500"
-            src={user?.image}
+            src={user?.image?.url || "/default-user-image.png"}
             size="sm"
           ></Avatar>
         </button>
       </PopoverHandler>
       <PopoverContent className="w-72">
         <div className="mb-4 flex items-center gap-4 border-b border-blue-gray-50 pb-4">
-          <Avatar src={user?.image} />
+          <Avatar src={user?.image?.url || "/default-user-image.png"} />
           <div>
             <Typography variant="h6" color="blue-gray">
-              {user?.full_name || "No name"}
+              {user?.full_name || "Full name"}
             </Typography>
             <Typography
               variant="small"

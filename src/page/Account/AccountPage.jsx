@@ -1,18 +1,13 @@
-import { Button, Input } from "@material-tailwind/react";
+import { Input } from "@material-tailwind/react";
 import { FaEdit } from "react-icons/fa";
 import "./Style.css";
 import ChangePasswordDialog from "./ChangePasswordDialog";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../context/AuthContext";
 
 function AccountPage() {
   const [changingPassword, setChangingPassword] = useState(false);
-
-  const user = {
-    full_name: "Hien Thai",
-    studen_id: "",
-    phone_number: "",
-    email: "hienthai@gmail.com",
-  };
+  const { user } = useContext(AuthContext);
 
   function handleChangePassword() {
     setChangingPassword(!changingPassword);
@@ -23,15 +18,15 @@ function AccountPage() {
       <div className="h-[300px] w-full cover-image px-6 flex justify-center">
         <div className="h-full w-full xl:w-[900px]">
           <h1 className="text-3xl text-gray-50 font-semibold pt-20">
-            Hello Hien Thai
+            Hello {user?.full_name}
           </h1>
         </div>
       </div>
       <div className="-mt-[160px] flex justify-end w-full xl:w-[900px] mx-auto z-10">
         <div className="w-4/12 flex justify-center">
           <img
-            className="w-40 h-40 h- rounded-full object-center object-cover"
-            src="https://afamilycdn.com/150157425591193600/2023/7/10/3581026861353491429191131976811112986346003n-168896101713887268472.jpg"
+            className="w-40 h-40 rounded-full object-cover bg-indigo-500"
+            src={user?.image?.url || "/default-user-image.png"}
           ></img>
         </div>
       </div>
@@ -52,7 +47,7 @@ function AccountPage() {
                 <Input
                   label="Full name"
                   variant="standard"
-                  value={"Hien Thai"}
+                  value={user?.full_name || " "}
                   readOnly={true}
                 ></Input>
                 <Input
@@ -64,7 +59,7 @@ function AccountPage() {
                 <Input
                   label="Student ID"
                   variant="standard"
-                  value={"20120472"}
+                  value={" "}
                   readOnly={true}
                 ></Input>
               </div>
@@ -75,7 +70,7 @@ function AccountPage() {
                 <Input
                   label="Email"
                   variant="standard"
-                  value={"hienthai@gmail.com"}
+                  value={user?.email || " "}
                   readOnly={true}
                 ></Input>
                 <div className="relative w-full flex">
@@ -83,8 +78,8 @@ function AccountPage() {
                     label="Password"
                     type="password"
                     variant="standard"
-                    value={"12323432423"}
                     className="pr-20"
+                    value={"***************"}
                     containerProps={{
                       className: "min-w-0",
                     }}
@@ -98,7 +93,7 @@ function AccountPage() {
                   <ChangePasswordDialog
                     open={changingPassword}
                     handleOpen={handleChangePassword}
-                    email={user.email}
+                    email={user?.email}
                   ></ChangePasswordDialog>
                 </div>
               </div>

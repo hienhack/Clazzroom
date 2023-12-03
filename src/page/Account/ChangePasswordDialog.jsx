@@ -13,6 +13,10 @@ function ChangePasswordDialog({ email, open, handleOpen }) {
 
   function handleChangePassword() {
     setSending(true);
+
+    // Call api to reset password here, setSending = false and setSent = true after receiving the response
+    // Ignore errors
+
     setTimeout(() => {
       setSending(false);
       setIsSent(true);

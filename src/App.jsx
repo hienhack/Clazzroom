@@ -71,7 +71,7 @@ function App() {
             <Route path="/" element={<PrivatePage element={<HomePage />} />} />
             <Route
               path="/account"
-              element={<PublicPage element={<AccountPage />} />}
+              element={<PrivatePage element={<AccountPage />} />}
             />
           </Routes>
         </div>
