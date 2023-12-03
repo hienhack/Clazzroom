@@ -2,12 +2,18 @@ import { FiMenu } from "react-icons/fi";
 import { FaBell } from "react-icons/fa";
 import AccountMenu from "./AccountMenu";
 
-function Navbar() {
+function Navbar({ handleSidebar }) {
   return (
-    <header class="w-full px-6 border-b-gray-300 border-b-[1px]">
+    <header className="w-full px-6 border-b-gray-300 border-b-[1px]">
       <div className="w-full h-[65px] flex justify-between items-center">
         <div className="flex gap-6">
-          <button className="p-3 -m-3 hover:bg-blue-gray-50 rounded-full h-fit">
+          <button
+            className="p-3 -m-3 hover:bg-blue-gray-50 rounded-full h-fit"
+            onClick={() => {
+              console.log("clicked");
+              handleSidebar();
+            }}
+          >
             <FiMenu size="1.3rem" className="fill-blue-gray-800 w-6 h-6" />
           </button>
           <div className="flex gap-2 items-center">

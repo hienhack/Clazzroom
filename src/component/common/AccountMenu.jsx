@@ -9,7 +9,9 @@ import {
   ListItemPrefix,
 } from "@material-tailwind/react";
 import { useContext } from "react";
-import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
+import { FaUserCircle, FaSignOutAlt, FaRegUserCircle } from "react-icons/fa";
+import { PiSignOutFill } from "react-icons/pi";
+import { PiSignOutBold } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -36,14 +38,14 @@ function AccountMenu() {
           <Avatar src={user?.image} />
           <div>
             <Typography variant="h6" color="blue-gray">
-              {user?.full_name}
+              {user?.full_name || "No name"}
             </Typography>
             <Typography
               variant="small"
               color="gray"
               className="font-medium text-blue-gray-500"
             >
-              {user?.email}
+              {user?.email || "abc@gmail.com"}
             </Typography>
           </div>
         </div>
@@ -52,7 +54,7 @@ function AccountMenu() {
             to="/account"
             className="text-initial font-medium text-blue-gray-500"
           >
-            <ListItem>
+            <ListItem className="hover:bg-blue-gray-100">
               <ListItemPrefix>
                 <FaUserCircle size="1.25rem" />
               </ListItemPrefix>
@@ -60,12 +62,12 @@ function AccountMenu() {
             </ListItem>
           </Link>
           <button
-            className="text-initial font-medium text-blue-gray-500"
+            className="text-initial font-medium text-blue-gray-500 "
             onClick={handleSignout}
           >
-            <ListItem>
+            <ListItem className="hover:bg-blue-gray-100">
               <ListItemPrefix>
-                <FaSignOutAlt size="1.25rem" />
+                <PiSignOutBold size="1.25rem" />
               </ListItemPrefix>
               Sign Out
             </ListItem>

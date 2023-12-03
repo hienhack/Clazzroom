@@ -4,9 +4,11 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import HomePage from "./page/Home/HomePage";
 import LoginPage from "./page/Login/LoginPage";
 import VerificationPage from "./page/Verification/VerificationPage";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "./context/AuthContext";
 import RegisterPage from "./page/Register/RegisterPage";
+import Sidebar from "./component/common/Sidebar";
+import AccountPage from "./page/Account/AccountPage";
 
 function PrivatePage({ element }) {
   const { user } = useContext(AuthContext);
@@ -35,26 +37,46 @@ function PublicPage({ element, restricted }) {
 function App() {
   const isNoNavbarPaths = ["/sign-in", "/sign-up", "/verification"];
   const isNoNavbar = isNoNavbarPaths.includes(useLocation().pathname);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   return (
-    <>
-      {!isNoNavbar && <Navbar />}
-      <Routes>
-        <Route
-          path="/sign-in"
-          element={<PublicPage element={<LoginPage />} />}
-        />
-        <Route
-          path="/sign-up"
-          element={<PublicPage element={<RegisterPage />} />}
-        />
-        <Route
-          path="/verification"
-          element={<PrivatePage element={<VerificationPage />} />}
-        />
-        <Route path="/" element={<PrivatePage element={<HomePage />} />} />
-      </Routes>
-    </>
+    <div>
+      {!isNoNavbar && (
+        <Navbar handleSidebar={() => setShowSidebar(!showSidebar)} />
+      )}
+      <div className="flex w-full min-h-screen">
+        {!isNoNavbar && (
+          <div
+            className={`transition-[width] ease-linear duration-100 ${
+              showSidebar ? "w-[0] invisible" : "w-[300px]"
+            }`}
+          >
+            <Sidebar />
+          </div>
+        )}
+        <div className="grow bg-blue-gray-50">
+          <Routes>
+            <Route
+              path="/sign-in"
+              element={<PublicPage element={<LoginPage />} />}
+            />
+            <Route
+              path="/sign-up"
+              element={<PublicPage element={<RegisterPage />} />}
+            />
+            <Route
+              path="/verification"
+              element={<PrivatePage element={<VerificationPage />} />}
+            />
+            <Route path="/" element={<PublicPage element={<HomePage />} />} />
+            <Route
+              path="/account"
+              element={<PublicPage element={<AccountPage />} />}
+            />
+          </Routes>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -1,0 +1,5 @@
+.cover-image {
+    background-image: url('/account-page-cover-image.png');
+    background-size: cover;
+    background-position-y: 40%;
+}
