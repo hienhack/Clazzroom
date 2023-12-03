@@ -23,24 +23,28 @@ const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
   const { setUser } = useContext(AuthContext);
-
   const [loadedUser, setLoadeUser] = useState();
   const [forgotPw, setForgotPw] = useState(false);
   const [error, setError] = useState();
   const { login: loginToContext } = useContext(AuthContext);
+  const [sending, setSending] = useState(false);
   const navigate = useNavigate();
 
   function login(method, data, errorHandler) {
     const url = LOGIN_METHOD_URL[method];
+    setSending(true);
     axios
       .post(url, data)
       .then((res) => {
-        loginToContext(res.data);
+        loginToContext(res.data.data);
         navigate("/");
       })
       .catch((error) => {
         if (!errorHandler) return;
         errorHandler(error);
+      })
+      .finally(() => {
+        setSending(false);
       });
   }
 
@@ -208,8 +212,9 @@ function LoginPage() {
                   <Button
                     className="w-full text-center p-3 bg-blue-400 text-sm rounded-md font-semibold normal-case"
                     type="submit"
+                    disabled={sending}
                   >
-                    Continue
+                    {sending ? "Processing..." : "Continue"}
                   </Button>
                 </div>
               </form>
@@ -267,10 +272,7 @@ function LoginPage() {
             </>
           )}
           {registerNeeded && (
-            <MoreInfoForm
-              login={login}
-              handleCancel={handleCancelRegistor}
-            />
+            <MoreInfoForm login={login} handleCancel={handleCancelRegistor} />
           )}
           {forgotPw && (
             <ForgotPasswordForm

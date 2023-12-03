@@ -1,34 +1,45 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { MdEmail, MdOutlineClose, MdMarkEmailRead } from "react-icons/md";
+import { MdEmail, MdMarkEmailRead } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import { Button, Spinner } from "@material-tailwind/react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function VerificationPage() {
-  const { user, setUser } = useContext(AuthContext);
-  // const { user } = useContext(AuthContext);
-
-  // test user
-
-
   const { search } = useLocation();
   const token = new URLSearchParams(search).get("token_id");
-  const [error, setError] = useState();
-  const [success, setSuccess] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const { user, setUser, token: session_token } = useContext(AuthContext);
+  const [isVerified, setIsVerified] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(true);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (user.is_verified) {
-      setIsProcessing(false);
-      // setIsVerified(true);
+    // Waiting for user to be loaded
+    if (session_token != null && user == null) {
       return;
-    } else if (token == null) {
+    } else if (session_token == null && token == null) {
+      navigate("/sign-in");
       return;
     }
 
+    // User not logged in or logged in and not verified
+    if (user == null && token == null) {
+      navigate("/sign-in");
+      return;
+    } else if (user == null && token != null) {
+      setIsVerified(false); // default
+    } else if (user != null && token == null) {
+      setIsProcessing(false);
+      setIsVerified(user.is_verified);
+      return;
+    } else if (user != null && token != null) {
+      setIsVerified(false); // default
+    }
+
+    //  Token exists
     axios
       .post("/users/verify", {
         token: token,
@@ -38,22 +49,44 @@ function VerificationPage() {
           ...user,
           is_verified: true,
         });
-        setSuccess(true);
+        setIsVerified(true);
       })
       .catch((error) => {
         setError("This link is expired or invalid");
-        setSuccess(true);
+      })
+      .finally(() => {
+        setIsProcessing(false);
       });
-  }, []);
+  }, [user, session_token]);
+
+  function onfocus() {
+    if (session_token) {
+      axios
+        .get("/users/profile", {})
+        .then((res) => {
+          setUser(res.data.data);
+        })
+        .catch(() => {});
+    }
+  }
+
+  // Handling when user click back to this tab
+  useEffect(() => {
+    window.addEventListener("focus", onfocus);
+    return () => window.removeEventListener("focus", onfocus);
+  });
 
   function handleResendBtnClick() {
     setSending(true);
     axios
       .post("/users/resend-verification", {})
-      .then(() => {
-        setSending(false);
+      .then((res) => {
+        console.log(res);
       })
-      .catch((error) => { });
+      .catch((error) => {})
+      .finally(() => {
+        setSending(false);
+      });
   }
 
   return (
@@ -74,7 +107,7 @@ function VerificationPage() {
         </>
       )}
 
-      {((!token && user?.is_verified) || success) && (
+      {isVerified && (
         <>
           <div className="-mt-6 p-6 rounded-full bg-green-200 w-fit">
             <MdMarkEmailRead size="2rem" className="fill-green-600" />
@@ -86,7 +119,7 @@ function VerificationPage() {
         </>
       )}
 
-      {!token && !user?.is_verified && (
+      {!isVerified && !isProcessing && !error && (
         <>
           <div className="-mt-6 p-6 rounded-full bg-green-200 w-fit">
             <MdEmail size="2rem" className="fill-green-600" />

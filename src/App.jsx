@@ -11,12 +11,12 @@ import Sidebar from "./component/common/Sidebar";
 import AccountPage from "./page/Account/AccountPage";
 
 function PrivatePage({ element }) {
-  const { user } = useContext(AuthContext);
+  const { token, user } = useContext(AuthContext);
   const path = useLocation().pathname;
 
-  if (user == null) {
+  if (token == null) {
     return <Navigate to="/sign-in" />;
-  } else if (!user.is_verified) {
+  } else if (user && !user.is_verified) {
     return path == "/verification" ? (
       <VerificationPage />
     ) : (
@@ -28,7 +28,7 @@ function PrivatePage({ element }) {
 }
 
 function PublicPage({ element, restricted }) {
-  restricted = restricted || false;
+  restricted = restricted | false;
   const { user } = useContext(AuthContext);
 
   return restricted && user != null ? <Navigate to="/" /> : element;
@@ -66,9 +66,9 @@ function App() {
             />
             <Route
               path="/verification"
-              element={<PrivatePage element={<VerificationPage />} />}
+              element={<PublicPage element={<VerificationPage />} />}
             />
-            <Route path="/" element={<PublicPage element={<HomePage />} />} />
+            <Route path="/" element={<PrivatePage element={<HomePage />} />} />
             <Route
               path="/account"
               element={<PublicPage element={<AccountPage />} />}

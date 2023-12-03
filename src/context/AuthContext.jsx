@@ -1,61 +1,43 @@
 import axios from "axios";
-import { createContext, useCallback, useEffect, useState } from "react";
-// import { ErrorMessage } from "@hookform/error-message";
+import { createContext, useLayoutEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState();
-  //   const [user, setUser] = useState(testUser);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-  const login = useCallback((loginData, errorHandler) => {
+  function login(loginData) {
     localStorage.setItem("token", loginData.token);
+    setToken(loginData.token);
+    setUser(loginData.user);
+  }
+
+  function logout() {
+    localStorage.removeItem("token");
+    setToken(null);
+    setUser(null);
+  }
+
+  useLayoutEffect(() => {
+    if (!token) return;
+
     axios
-      .get("/users/profile", loginData.token)
+      .get("/users/profile", {})
       .then((res) => {
         setUser(res.data.data);
       })
       .catch((error) => {
-        if (!errorHandler) return;
-        errorHandler(error);
+        localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
       });
-
-  }, []);
-
-  const logout = useCallback(() => {
-    localStorage.removeItem("token");
-    setUser(null);
-  }, []);
-
-  console.log("go here");
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    // Load account
-    // axios.post('/account', {
-    //     token:
-    // })
-
-    // pesudo-user
-    console.log("Loading user");
-    let loadedUser = {
-      is_verified: false,
-      image: "",
-      full_name: "Hien Thai",
-      email: "hienthai@gmail.com",
-    };
-
-    setUser(loadedUser);
   }, []);
 
   return (
-    // <GoogleOAuthProvider clientId="808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com">
-    <AuthContext.Provider value={{ login, logout, setUser, user }}>
+    <AuthContext.Provider value={{ login, logout, setUser, user, token }}>
       {children}
     </AuthContext.Provider>
-    // </GoogleOAuthProvider>
   );
 }
 
