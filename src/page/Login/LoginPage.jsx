@@ -45,7 +45,7 @@ function LoginPage() {
   }
 
   function onSubmit(data) {
-    login(data, (error) => {
+    login("basic", data, (error) => {
       setError(error.response.data.message);
     });
   }

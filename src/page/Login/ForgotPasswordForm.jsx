@@ -3,6 +3,7 @@ import { Button, Input } from "@material-tailwind/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdKeyboardBackspace } from "react-icons/md";
+import axios from "axios";
 
 function ForgotPasswordForm({ onBack }) {
   const [success, setSucess] = useState(false);
@@ -18,19 +19,36 @@ function ForgotPasswordForm({ onBack }) {
     // Send request containing email to api resetPw
     // If error 500 happens, alert, otherwise just ignore it
     // If success, setSucess(true)
-    // set
+    axios.post('users/send-email-renew-pw', { email: data.email })
+      .then((res) => {
+        setSucess(true)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+      .finally(() => {
+        setSending(false);
+        setSent(true);
 
-    setTimeout(() => {
-      setSent(true);
-      setSending(false);
-    }, 3000);
+      });
+
   }
 
-  function handleResend() {
-    setSending(true);
-    // send request containing emailInputed to pai resetPw again
-    // If error 500 happens, alert, otherwise just ignore it
-  }
+  // function handleResend() {
+  //   setSending(true);
+  //   axios.post('users/send-email-renew-pw', { email: emailInputed })
+  //     .then((res) => {
+  //       setSucess(true)
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     })
+  //     .finally(() => {
+  //       setSending(false);
+  //       setSent(true);
+
+  //     });
+  // }
 
   const {
     register,
