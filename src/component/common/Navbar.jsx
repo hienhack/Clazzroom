@@ -1,6 +1,7 @@
 import { FiMenu } from "react-icons/fi";
 import { FaBell } from "react-icons/fa";
 import AccountMenu from "./AccountMenu";
+import { Link } from "react-router-dom";
 
 function Navbar({ handleSidebar }) {
   return (
@@ -10,18 +11,19 @@ function Navbar({ handleSidebar }) {
           <button
             className="p-3 -m-3 hover:bg-blue-gray-50 rounded-full h-fit"
             onClick={() => {
-              console.log("clicked");
               handleSidebar();
             }}
           >
             <FiMenu size="1.3rem" className="fill-blue-gray-800 w-6 h-6" />
           </button>
-          <div className="flex gap-2 items-center">
-            <img className="h-[20px]" src="/vite.svg"></img>
-            <h1 className="text-xl font-semibold text-blue-gray-800">
-              Clazzroom
-            </h1>
-          </div>
+          <Link to="/">
+            <div className="flex gap-2 items-center">
+              <img className="h-[20px]" src="/vite.svg"></img>
+              <h1 className="text-xl font-semibold text-blue-gray-800">
+                Clazzroom
+              </h1>
+            </div>
+          </Link>
         </div>
         <div className="flex gap-4 items-center">
           <button className="p-2 -m-2 rounded-full hover:bg-blue-gray-50 fill-blue-gray-300 hover:fill-blue-gray-600">
