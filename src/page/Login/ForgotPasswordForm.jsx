@@ -19,7 +19,7 @@ function ForgotPasswordForm({ onBack }) {
     // Send request containing email to api resetPw
     // If error 500 happens, alert, otherwise just ignore it
     // If success, setSucess(true)
-    axios.post('users/send-email-renew-pw', { email: data.email })
+    axios.post('users/send-email-reset-pw', { email: data.email })
       .then((res) => {
         setSucess(true)
       })
@@ -31,7 +31,18 @@ function ForgotPasswordForm({ onBack }) {
         setSent(true);
 
       });
+    // axios.post('users/send-email-renew-pw', { email: data.email })
+    // .then((res) => {
+    //   setSucess(true)
+    // })
+    // .catch((error) => {
+    //   console.log(error);
+    // })
+    // .finally(() => {
+    //   setSending(false);
+    //   setSent(true);
 
+    // });
   }
 
   // function handleResend() {
