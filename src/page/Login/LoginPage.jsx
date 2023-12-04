@@ -67,7 +67,7 @@ function LoginPage() {
       login("facebook", { fb_id }, (error) => {
         if (error?.response?.status === 401) {
           const user = { fb_id, full_name, email, image };
-          setUser(user);
+          // setUser(user);
           setRegisterNeeded(true);
         }
       });
@@ -81,7 +81,7 @@ function LoginPage() {
     const clientId =
       "808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com";
     const clientSecret = "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";
-    const redirectUri = "http://localhost:5173";
+    const redirectUri = "http://localhost:3000";
 
     const requestBody = {
       code: response.code,
