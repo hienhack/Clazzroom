@@ -10,23 +10,34 @@ import axios from "axios";
 
 function ResetPasswordPage({ title }) {
   const [error, setError] = useState(null);
+  const [sending, setSending] = useState(false);
   const [success, setSuccess] = useState(false);
   const { search } = useLocation();
   const navigate = useNavigate();
 
   function onSubmit(data) {
-    console.log(data);
     const reqData = {
       token: new URLSearchParams(search).get("token_id") || "",
       newPassword: data.password,
     };
-    axios.patch('users/resetPw', reqData)
+
+    setSending(true);
+
+    console.log(reqData);
+    axios
+      .patch("/users/resetPw", reqData)
       .then((res) => {
-        setSuccess(true)
+        setSuccess(true);
       })
       .catch((error) => {
         console.log(error);
+        if (error.response.status == 500) {
+          setError("Something went wrong, please try again!");
+        }
       })
+      .finally(() => {
+        setSending(false);
+      });
 
     // Call api with data = reqData. If error happens, use setError(error message);
   }
@@ -116,8 +127,9 @@ function ResetPasswordPage({ title }) {
                 <Button
                   className="mt-5 w-full text-center p-3 bg-blue-400 text-sm rounded-md font-semibold normal-case"
                   type="submit"
+                  disabled={sending}
                 >
-                  Continue
+                  {sending ? "Processing..." : "Continue"}
                 </Button>
               </div>
             </form>
@@ -146,7 +158,7 @@ function ResetPasswordPage({ title }) {
                 <span className="font-bold">{props.seconds}</span>
               )}
               onComplete={handleCountComplete}
-            // autoStart={false}
+              // autoStart={false}
             ></Countdown>
             s
           </h6>
