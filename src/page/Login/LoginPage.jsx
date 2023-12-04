@@ -113,8 +113,9 @@ function LoginPage() {
                 // setRegisterNeeded(true);
 
                 axios.post("/users/register", user).then((res) => {
-                  login("google", user, () => {
-                    setError(error.response.data.message);
+                  login("google", user, (e) => {
+                    setError(e.response.data.message);
+
                   });
                 });
               }
