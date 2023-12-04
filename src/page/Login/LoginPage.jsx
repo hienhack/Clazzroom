@@ -81,7 +81,7 @@ function LoginPage() {
     const clientId =
       "808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com";
     const clientSecret = "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";
-    const redirectUri = "http://localhost:5173";
+    const redirectUri = "http://localhost:3000";
 
     const requestBody = {
       code: response.code,
@@ -107,8 +107,16 @@ function LoginPage() {
             login("google", { gg_id }, (error) => {
               if (error?.response?.status === 401) {
                 const user = { gg_id, full_name, email, image };
-                setUser(user);
-                setRegisterNeeded(true);
+
+                console.log(user);
+                // setUser(user);
+                // setRegisterNeeded(true);
+
+                axios.post("/users/register", user).then((res) => {
+                  login("google", user, () => {
+                    setError(error.response.data.message);
+                  });
+                });
               }
             });
           })
