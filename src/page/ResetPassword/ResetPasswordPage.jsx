@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import { FaCheck } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import Countdown from "react-countdown";
+import axios from "axios";
 
 function ResetPasswordPage({ title }) {
   const [error, setError] = useState(null);
@@ -17,11 +18,17 @@ function ResetPasswordPage({ title }) {
     console.log(data);
     const reqData = {
       token: new URLSearchParams(search).get("token_id") || "",
-      password: data.password,
+      newPassword: data.password,
     };
+    axios.post('users/resetPw', reqData)
+      .then((res) => {
+        setSuccess(true)
+      })
+      .catch((error) => {
+        console.log(error);
+      })
 
     // Call api with data = reqData. If error happens, use setError(error message);
-    setSuccess(true);
   }
 
   function handleCountComplete() {
@@ -139,7 +146,7 @@ function ResetPasswordPage({ title }) {
                 <span className="font-bold">{props.seconds}</span>
               )}
               onComplete={handleCountComplete}
-              // autoStart={false}
+            // autoStart={false}
             ></Countdown>
             s
           </h6>
