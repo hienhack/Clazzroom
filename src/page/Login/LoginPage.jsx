@@ -31,6 +31,7 @@ function LoginPage() {
   const navigate = useNavigate();
 
   function login(method, data, errorHandler) {
+    console.log("acb", data);
     const url = LOGIN_METHOD_URL[method];
     setSending(true);
     axios
