@@ -81,7 +81,7 @@ function LoginPage() {
     const clientId =
       "808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com";
     const clientSecret = "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";
-    const redirectUri = "http://localhost:3000";
+    const redirectUri = "https://clazzroom.vercel.app";
 
     const requestBody = {
       code: response.code,
