@@ -14,10 +14,17 @@ function ResetPasswordPage({ title }) {
   const [success, setSuccess] = useState(false);
   const { search } = useLocation();
   const navigate = useNavigate();
+  const token = new URLSearchParams(search).get("token_id") || "";
+
+  useEffect(() => {
+    if (token == "") {
+      navigate("/");
+    }
+  }, []);
 
   function onSubmit(data) {
     const reqData = {
-      token: new URLSearchParams(search).get("token_id") || "",
+      token: token,
       newPassword: data.password,
     };
 
@@ -31,15 +38,15 @@ function ResetPasswordPage({ title }) {
       })
       .catch((error) => {
         console.log(error);
-        if (error.response.status == 500) {
+        if (error.response.status == 403 || error.response.status == 401) {
+          setError("This link is expired or does not exist");
+        } else {
           setError("Something went wrong, please try again!");
         }
       })
       .finally(() => {
         setSending(false);
       });
-
-    // Call api with data = reqData. If error happens, use setError(error message);
   }
 
   function handleCountComplete() {
