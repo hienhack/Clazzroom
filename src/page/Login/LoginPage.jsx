@@ -67,7 +67,7 @@ function LoginPage() {
       login("facebook", { fb_id }, (error) => {
         if (error?.response?.status === 401) {
           const user = { fb_id, full_name, email, image };
-          setUser(user);
+          // setUser(user);
           setRegisterNeeded(true);
         }
       });
