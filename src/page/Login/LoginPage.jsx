@@ -31,7 +31,6 @@ function LoginPage() {
   const navigate = useNavigate();
 
   function login(method, data, errorHandler) {
-    console.log("acb", data);
     const url = LOGIN_METHOD_URL[method];
     setSending(true);
     axios
@@ -73,7 +72,6 @@ function LoginPage() {
         }
       });
     } else {
-      console.log("Facebook login failed");
     }
   }
 
@@ -109,7 +107,6 @@ function LoginPage() {
               if (error?.response?.status === 401) {
                 const user = { gg_id, full_name, email, image };
 
-                console.log(user);
                 // setUser(user);
                 // setRegisterNeeded(true);
 
@@ -242,7 +239,6 @@ function LoginPage() {
                     handleGoogleLogin(data);
                   }}
                   onReject={(error) => {
-                    console.log(error);
                   }}
                 >
                   <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800">
@@ -257,7 +253,6 @@ function LoginPage() {
                     handleFacebookLogin(response.data);
                   }}
                   onReject={(error) => {
-                    console.log(error);
                   }}
                 >
                   <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">

@@ -24,7 +24,6 @@ function ForgotPasswordForm({ onBack }) {
         setSucess(true)
       })
       .catch((error) => {
-        console.log(error);
       })
       .finally(() => {
         setSending(false);

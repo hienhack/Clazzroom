@@ -64,7 +64,7 @@ function VerificationPage() {
         .then((res) => {
           setUser(res.data.data);
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }
 
@@ -79,9 +79,8 @@ function VerificationPage() {
     axios
       .post("/users/resend-verification", {})
       .then((res) => {
-        console.log(res);
       })
-      .catch((error) => {})
+      .catch((error) => { })
       .finally(() => {
         setSending(false);
       });

@@ -30,14 +30,12 @@ function ResetPasswordPage({ title }) {
 
     setSending(true);
 
-    console.log(reqData);
     axios
       .patch("/users/resetPw", reqData)
       .then((res) => {
         setSuccess(true);
       })
       .catch((error) => {
-        console.log(error);
         if (error.response.status == 403 || error.response.status == 401) {
           setError("This link is expired or does not exist");
         } else {
@@ -165,7 +163,7 @@ function ResetPasswordPage({ title }) {
                 <span className="font-bold">{props.seconds}</span>
               )}
               onComplete={handleCountComplete}
-              // autoStart={false}
+            // autoStart={false}
             ></Countdown>
             s
           </h6>
