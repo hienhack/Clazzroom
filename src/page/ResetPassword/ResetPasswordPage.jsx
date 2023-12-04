@@ -20,7 +20,7 @@ function ResetPasswordPage({ title }) {
       token: new URLSearchParams(search).get("token_id") || "",
       newPassword: data.password,
     };
-    axios.post('users/resetPw', reqData)
+    axios.patch('users/resetPw', reqData)
       .then((res) => {
         setSuccess(true)
       })
