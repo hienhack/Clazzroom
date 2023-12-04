@@ -9,6 +9,7 @@ import { AuthContext } from "./context/AuthContext";
 import RegisterPage from "./page/Register/RegisterPage";
 import Sidebar from "./component/common/Sidebar";
 import AccountPage from "./page/Account/AccountPage";
+import ResetPasswordPage from "./page/ResetPassword/ResetPasswordPage";
 
 function PrivatePage({ element }) {
   const { token, user } = useContext(AuthContext);
@@ -35,7 +36,12 @@ function PublicPage({ element, restricted }) {
 }
 
 function App() {
-  const isNoNavbarPaths = ["/sign-in", "/sign-up", "/verification"];
+  const isNoNavbarPaths = [
+    "/sign-in",
+    "/sign-up",
+    "/verification",
+    "/reset-password",
+  ];
   const isNoNavbar = isNoNavbarPaths.includes(useLocation().pathname);
   const [showSidebar, setShowSidebar] = useState(true);
 
@@ -63,6 +69,10 @@ function App() {
             <Route
               path="/sign-up"
               element={<PublicPage element={<RegisterPage />} />}
+            />
+            <Route
+              path="/reset-password"
+              element={<PublicPage element={<ResetPasswordPage />} />}
             />
             <Route
               path="/verification"
