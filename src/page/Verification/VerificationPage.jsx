@@ -45,10 +45,8 @@ function VerificationPage() {
         token: token,
       })
       .then((res) => {
-        setUser({
-          ...user,
-          is_verified: true,
-        });
+        user.is_verified = true;
+        setUser(user);
         setIsVerified(true);
       })
       .catch((error) => {
