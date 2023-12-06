@@ -58,7 +58,7 @@ function LoginPage() {
   function handleFacebookLogin(response) {
     if (response?.accessToken) {
       const {
-        userID: fb_id,
+        id: fb_id,
         name: full_name,
         email,
         picture: {
@@ -72,7 +72,6 @@ function LoginPage() {
           setRegisterNeeded(true);
         }
       });
-    } else {
     }
   }
 
@@ -250,16 +249,19 @@ function LoginPage() {
                 <FacebookLogin
                   appId="2580168245493289"
                   onSuccess={(response) => {
-                    console.log(response);
-                    handleFacebookLogin(response.data);
                   }}
                   onFail={(error) => {
                     console.log('Login Failed!', error);
                   }}
                   onProfileSuccess={(response) => {
-                    console.log('Get Profile Success!', response);
+                    handleFacebookLogin(response);
                   }}
-
+                  render={() => (
+                    <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
+                      <FaFacebook size="1.2rem" className="fill-inherit" />
+                      <span>Facebook</span>
+                    </button>
+                  )}
                 />
                 {/* <LoginSocialFacebook
                   appId="2580168245493289"
