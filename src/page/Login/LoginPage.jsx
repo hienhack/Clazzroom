@@ -250,6 +250,7 @@ function LoginPage() {
                 <FacebookLogin
                   appId="2580168245493289"
                   onSuccess={(response) => {
+                    console.log(response);
                     handleFacebookLogin(response.data);
                   }}
                   onFail={(error) => {
@@ -258,12 +259,7 @@ function LoginPage() {
                   onProfileSuccess={(response) => {
                     console.log('Get Profile Success!', response);
                   }}
-                  render={() => (
-                    <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
-                      <FaFacebook size="1.2rem" className="fill-inherit" />
-                      <span>Facebook</span>
-                    </button>
-                  )}
+
                 />
                 {/* <LoginSocialFacebook
                   appId="2580168245493289"
