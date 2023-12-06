@@ -56,7 +56,7 @@ function LoginPage() {
   }
 
   function handleFacebookLogin(response) {
-    if (response?.accessToken) {
+    if (response?.id) {
       const {
         id: fb_id,
         name: full_name,
