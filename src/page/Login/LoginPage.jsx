@@ -9,6 +9,7 @@ import axios from "axios";
 import MoreInfoForm from "./MoreInfoForm";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
+import FacebookLogin from '@greatsumini/react-facebook-login';
 
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
@@ -246,7 +247,25 @@ function LoginPage() {
                     <span>Google</span>
                   </button>
                 </LoginSocialGoogle>
-                <LoginSocialFacebook
+                <FacebookLogin
+                  appId="2580168245493289"
+                  onSuccess={(response) => {
+                    handleFacebookLogin(response.data);
+                  }}
+                  onFail={(error) => {
+                    console.log('Login Failed!', error);
+                  }}
+                  onProfileSuccess={(response) => {
+                    console.log('Get Profile Success!', response);
+                  }}
+                  render={() => (
+                    <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
+                      <FaFacebook size="1.2rem" className="fill-inherit" />
+                      <span>Facebook</span>
+                    </button>
+                  )}
+                />
+                {/* <LoginSocialFacebook
                   appId="2580168245493289"
                   fields="name,email,picture"
                   onResolve={(response) => {
@@ -259,7 +278,7 @@ function LoginPage() {
                     <FaFacebook size="1.2rem" className="fill-inherit" />
                     <span>Facebook</span>
                   </button>
-                </LoginSocialFacebook>
+                </LoginSocialFacebook> */}
               </div>
               <div className="mt-10 flex gap-2 items-center">
                 <h1 className="text-sm text-gray-700">
