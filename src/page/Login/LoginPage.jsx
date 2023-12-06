@@ -9,7 +9,7 @@ import axios from "axios";
 import MoreInfoForm from "./MoreInfoForm";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
-import FacebookLogin from '@greatsumini/react-facebook-login';
+import FacebookLogin from "@greatsumini/react-facebook-login";
 
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
@@ -113,7 +113,6 @@ function LoginPage() {
                 axios.post("/users/register", user).then((res) => {
                   login("google", user, (e) => {
                     setError(e.response.data.message);
-
                   });
                 });
               }
@@ -238,8 +237,7 @@ function LoginPage() {
                   onResolve={({ provider, data }) => {
                     handleGoogleLogin(data);
                   }}
-                  onReject={(error) => {
-                  }}
+                  onReject={(error) => { }}
                 >
                   <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800">
                     <FaGoogle size="1.2rem" className="fill-inherit" />
@@ -248,21 +246,21 @@ function LoginPage() {
                 </LoginSocialGoogle>
                 <FacebookLogin
                   appId="2580168245493289"
-                  onSuccess={(response) => {
-                  }}
+                  onSuccess={(response) => { }}
                   onFail={(error) => {
-                    console.log('Login Failed!', error);
+                    console.log("Login Failed!", error);
                   }}
                   onProfileSuccess={(response) => {
                     handleFacebookLogin(response);
                   }}
-                // render={() => (
-                //   <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
-                //     <FaFacebook size="1.2rem" className="fill-inherit" />
-                //     <span>Facebook</span>
-                //   </button>
+
                 // )}
-                />
+                >
+                  <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
+                    <FaFacebook size="1.2rem" className="fill-inherit" />
+                    <span>Facebook</span>
+                  </button>
+                </FacebookLogin>
                 {/* <LoginSocialFacebook
                   appId="2580168245493289"
                   fields="name,email,picture"
@@ -294,7 +292,11 @@ function LoginPage() {
             </>
           )}
           {registerNeeded && (
-            <MoreInfoForm login={login} handleCancel={handleCancelRegistor} user={loadedUser} />
+            <MoreInfoForm
+              login={login}
+              handleCancel={handleCancelRegistor}
+              user={loadedUser}
+            />
           )}
           {forgotPw && (
             <ForgotPasswordForm
