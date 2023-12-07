@@ -262,6 +262,7 @@ function LoginPage() {
                   </button>
                 </FacebookLogin>
                 <LoginButton />
+
                 {/* <LoginSocialFacebook
                   appId="2580168245493289"
                   fields="name,email,picture"
