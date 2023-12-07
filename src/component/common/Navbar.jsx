@@ -7,7 +7,7 @@ function Navbar({ handleSidebar }) {
   return (
     <header className="w-full px-6 border-b-gray-300 border-b-[1px]">
       <div className="w-full h-[65px] flex justify-between items-center">
-        <div className="flex gap-6">
+        <div className="flex gap-6 items-center">
           <button
             className="p-3 -m-3 hover:bg-blue-gray-50 rounded-full h-fit"
             onClick={() => {
@@ -18,8 +18,8 @@ function Navbar({ handleSidebar }) {
           </button>
           <Link to="/">
             <div className="flex gap-2 items-center">
-              <img className="h-[20px]" src="/vite.svg"></img>
-              <h1 className="text-xl font-semibold text-blue-gray-800">
+              <img className="h-[30px]" src="/logo.png"></img>
+              <h1 className="text-xl font-semibold text-blue-gray-500">
                 Clazzroom
               </h1>
             </div>
