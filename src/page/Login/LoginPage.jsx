@@ -11,7 +11,6 @@ import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
 import FacebookLogin from "@greatsumini/react-facebook-login";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import { useAuth0 } from '@auth0/auth0-react';
 
 const LOGIN_METHOD_URL = {
   facebook: "/users/facebook-oauth",
@@ -139,21 +138,6 @@ function LoginPage() {
     setRegisterNeeded(false);
     setLoadeUser({});
   }
-
-  const { loginWithPopup, user } = useAuth0();
-
-
-  const handleLoginWithGoogle = async () => {
-    try {
-      await loginWithPopup({
-        connection: 'google-oauth2',
-        scope: 'openid email profile' // Phạm vi yêu cầu từ Google
-      });
-      console.log(user);
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
-  };
 
   const {
     register,
