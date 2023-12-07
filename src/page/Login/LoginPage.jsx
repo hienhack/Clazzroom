@@ -10,8 +10,8 @@ import MoreInfoForm from "./MoreInfoForm";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
 import FacebookLogin from "@greatsumini/react-facebook-login";
-import LoginButton from "./LoginButton";
 import ForgotPasswordForm from "./ForgotPasswordForm";
+import { useAuth0 } from '@auth0/auth0-react';
 
 const LOGIN_METHOD_URL = {
   facebook: "/users/facebook-oauth",
@@ -48,6 +48,18 @@ function LoginPage() {
         setSending(false);
       });
   }
+
+  const LoginButton = () => {
+    const { loginWithRedirect } = useAuth0();
+    return (
+      <button
+        className="btn btn-primary btn-block"
+        onClick={() => loginWithRedirect()}
+      >
+        Log In
+      </button>
+    );
+  };
 
   function onSubmit(data) {
     login("basic", data, (error) => {
