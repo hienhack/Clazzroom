@@ -140,6 +140,16 @@ function LoginPage() {
     setLoadeUser({});
   }
 
+  const { loginWithRedirect, user } = useAuth0();
+
+  const handleLoginWithGoogle = () => {
+    loginWithRedirect({
+      connection: 'google-oauth2',
+      scope: 'openid email profile' // Phạm vi yêu cầu từ Google
+    });
+    console.log(user)
+  };
+
   const {
     register,
     handleSubmit,
@@ -242,7 +252,12 @@ function LoginPage() {
                 <hr className="grow border-blue-gray-200" />
               </div>
               <div className="grid grid-cols-2  gap-3">
-                <LoginSocialGoogle
+                <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800" onClick={handleLoginWithGoogle}>
+                  <FaGoogle size="1.2rem" className="fill-inherit" />
+                  <span>Google</span>
+                </button>
+
+                {/* <LoginSocialGoogle
                   client_id="808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com"
                   discoveryDocs="claims_supported"
                   access_type="offline"
@@ -251,11 +266,8 @@ function LoginPage() {
                   }}
                   onReject={(error) => { }}
                 >
-                  <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800">
-                    <FaGoogle size="1.2rem" className="fill-inherit" />
-                    <span>Google</span>
-                  </button>
-                </LoginSocialGoogle>
+                  
+                </LoginSocialGoogle> */}
                 <FacebookLogin
                   appId="2580168245493289"
                   onSuccess={(response) => { }}
@@ -273,7 +285,6 @@ function LoginPage() {
                     <span>Facebook</span>
                   </button>
                 </FacebookLogin>
-                <LoginButton />
 
                 {/* <LoginSocialFacebook
                   appId="2580168245493289"
