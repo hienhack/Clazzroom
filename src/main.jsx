@@ -11,13 +11,12 @@ axiosConfig();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Auth0ProviderWithHistory>
-      <AuthProvider>
-        <BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Auth0ProviderWithHistory>
           <App />
-        </BrowserRouter>
-      </AuthProvider>
-    </Auth0ProviderWithHistory>
-
+        </Auth0ProviderWithHistory>
+      </BrowserRouter>
+    </AuthProvider>
   </React.StrictMode>
 );
