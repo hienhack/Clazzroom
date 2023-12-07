@@ -10,7 +10,7 @@ import MoreInfoForm from "./MoreInfoForm";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
 import FacebookLogin from "@greatsumini/react-facebook-login";
-
+import { LoginButton } from "./LoginButton";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
 const LOGIN_METHOD_URL = {
@@ -261,6 +261,7 @@ function LoginPage() {
                     <span>Facebook</span>
                   </button>
                 </FacebookLogin>
+                <LoginButton />
                 {/* <LoginSocialFacebook
                   appId="2580168245493289"
                   fields="name,email,picture"
