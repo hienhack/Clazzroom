@@ -50,17 +50,13 @@ function App() {
       {!isNoNavbar && (
         <Navbar handleSidebar={() => setShowSidebar(!showSidebar)} />
       )}
-      <div className="flex w-full min-h-screen">
+      <div className="flex w-full">
         {!isNoNavbar && (
-          <div
-            className={`transition-[width] ease-linear duration-100 ${
-              showSidebar ? "w-[0] invisible" : "w-[300px]"
-            }`}
-          >
-            <Sidebar />
+          <div>
+            <Sidebar open={showSidebar} />
           </div>
         )}
-        <div className="grow bg-blue-gray-50">
+        <div className="grow bg-gray-50">
           <Routes>
             <Route
               path="/sign-in"

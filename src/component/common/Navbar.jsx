@@ -18,10 +18,8 @@ function Navbar({ handleSidebar }) {
           </button>
           <Link to="/">
             <div className="flex gap-2 items-center">
-              <img className="h-[30px]" src="/logo.png"></img>
-              <h1 className="text-xl font-semibold text-blue-gray-500">
-                Clazzroom
-              </h1>
+              <img className="h-[30px] m-1" src="/logo.png"></img>
+              <h1 className="text-xl font-semibold text-gray-500">Clazzroom</h1>
             </div>
           </Link>
         </div>

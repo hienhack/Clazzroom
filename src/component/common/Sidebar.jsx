@@ -1,166 +1,68 @@
 import React from "react";
-import {
-  Card,
-  Typography,
-  List,
-  ListItem,
-  ListItemPrefix,
-  ListItemSuffix,
-  Chip,
-  Accordion,
-  AccordionHeader,
-  AccordionBody,
-} from "@material-tailwind/react";
-import {
-  PresentationChartBarIcon,
-  ShoppingBagIcon,
-  UserCircleIcon,
-  Cog6ToothIcon,
-  InboxIcon,
-  PowerIcon,
-} from "@heroicons/react/24/solid";
-import { ChevronRightIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { SiGoogleclassroom } from "react-icons/si";
+import { MdOutlineRateReview } from "react-icons/md";
+import { FaGraduationCap } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-function Sidebar() {
-  const [open, setOpen] = React.useState(0);
-
-  const handleOpen = (value) => {
-    setOpen(open === value ? 0 : value);
-  };
+function MenuItem({ open, isChosen, link, content, children: icon }) {
+  isChosen = isChosen || false;
+  if (open == undefined) {
+    open = true;
+  }
 
   return (
-    <div className="border-r-gray-300  border-r-[1px]">
-      <Card className="w-full p-4 shadow-none  rounded-none">
-        <div className="mb-2 p-4">
-          <Typography variant="h5" color="blue-gray">
-            Sidebar
-          </Typography>
+    <Link to={link}>
+      <div className="pr-4">
+        <div
+          className={`pl-6 pr-4 -mr-1 rounded-r-full py-3 flex gap-6 items-center ${
+            isChosen ? "bg-light-blue-50" : "hover:bg-gray-100"
+          }`}
+        >
+          <div
+            className={`w-6 h-6 flex justify-center ${
+              isChosen ? "fill-blue-gray-900" : "fill-blue-gray-700"
+            }`}
+          >
+            {icon}
+          </div>
+          <span
+            className={`truncate pe-5 ${
+              isChosen ? "text-blue-gray-900 font-medium" : "text-blue-gray-700"
+            } ${!open && "hidden"}`}
+          >
+            {content}
+          </span>
         </div>
-        <List>
-          <Accordion
-            open={open === 1}
-            icon={
-              <ChevronDownIcon
-                strokeWidth={2.5}
-                className={`mx-auto h-4 w-4 transition-transform ${
-                  open === 1 ? "rotate-180" : ""
-                }`}
-              />
-            }
+      </div>
+    </Link>
+  );
+}
+
+function Sidebar({ open }) {
+  return (
+    <div
+      className={`h-[calc(100vh-66px)] transition-[width] ease-linear duration-100 border-r border-gray-300 ${
+        open && "w-[300px]"
+      }`}
+    >
+      <div className="pt-2 h-full flex flex-col">
+        <MenuItem isChosen={true} content="Classes" link="/" open={open}>
+          <SiGoogleclassroom size="1.3rem" className="fill-inherit" />
+        </MenuItem>
+        <MenuItem isChosen={false} content="Grade review" link="/" open={open}>
+          <MdOutlineRateReview size="1.5rem" className="fill-inherit" />
+        </MenuItem>
+        <hr className="my-2"></hr>
+        <div className={`grow overflow-y-auto ${!open && "hidden"}`}>
+          <MenuItem
+            isChosen={false}
+            content="das fasd fasd fasd fsad fsad fsad f sdafsda f sdf "
+            link="/"
           >
-            <ListItem className="p-0" selected={open === 1}>
-              <AccordionHeader
-                onClick={() => handleOpen(1)}
-                className="border-b-0 p-3"
-              >
-                <ListItemPrefix>
-                  <PresentationChartBarIcon className="h-5 w-5" />
-                </ListItemPrefix>
-                <Typography color="blue-gray" className="mr-auto font-normal">
-                  Dashboard
-                </Typography>
-              </AccordionHeader>
-            </ListItem>
-            <AccordionBody className="py-1">
-              <List className="p-0">
-                <ListItem>
-                  <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                  </ListItemPrefix>
-                  Analytics
-                </ListItem>
-                <ListItem>
-                  <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                  </ListItemPrefix>
-                  Reporting
-                </ListItem>
-                <ListItem>
-                  <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                  </ListItemPrefix>
-                  Projects
-                </ListItem>
-              </List>
-            </AccordionBody>
-          </Accordion>
-          <Accordion
-            open={open === 2}
-            icon={
-              <ChevronDownIcon
-                strokeWidth={2.5}
-                className={`mx-auto h-4 w-4 transition-transform ${
-                  open === 2 ? "rotate-180" : ""
-                }`}
-              />
-            }
-          >
-            <ListItem className="p-0" selected={open === 2}>
-              <AccordionHeader
-                onClick={() => handleOpen(2)}
-                className="border-b-0 p-3"
-              >
-                <ListItemPrefix>
-                  <ShoppingBagIcon className="h-5 w-5" />
-                </ListItemPrefix>
-                <Typography color="blue-gray" className="mr-auto font-normal">
-                  E-Commerce
-                </Typography>
-              </AccordionHeader>
-            </ListItem>
-            <AccordionBody className="py-1">
-              <List className="p-0">
-                <ListItem>
-                  <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                  </ListItemPrefix>
-                  Orders
-                </ListItem>
-                <ListItem>
-                  <ListItemPrefix>
-                    <ChevronRightIcon strokeWidth={3} className="h-3 w-5" />
-                  </ListItemPrefix>
-                  Products
-                </ListItem>
-              </List>
-            </AccordionBody>
-          </Accordion>
-          <hr className="my-2 border-blue-gray-50" />
-          <ListItem>
-            <ListItemPrefix>
-              <InboxIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Inbox
-            <ListItemSuffix>
-              <Chip
-                value="14"
-                size="sm"
-                variant="ghost"
-                color="blue-gray"
-                className="rounded-full"
-              />
-            </ListItemSuffix>
-          </ListItem>
-          <ListItem>
-            <ListItemPrefix>
-              <UserCircleIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Profile
-          </ListItem>
-          <ListItem>
-            <ListItemPrefix>
-              <Cog6ToothIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Settings
-          </ListItem>
-          <ListItem>
-            <ListItemPrefix>
-              <PowerIcon className="h-5 w-5" />
-            </ListItemPrefix>
-            Log Out
-          </ListItem>
-        </List>
-      </Card>
+            <FaGraduationCap size="1.2rem" className="fill-inherit" />
+          </MenuItem>
+        </div>
+      </div>
     </div>
   );
 }
