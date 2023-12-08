@@ -1,15 +1,15 @@
 import "./App.css";
-import Navbar from "./component/common/Navbar";
+import Navbar from "./component/partials/Navbar";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import HomePage from "./page/Home/HomePage";
 import LoginPage from "./page/Login/LoginPage";
 import VerificationPage from "./page/Verification/VerificationPage";
 import { useContext, useState } from "react";
 import { AuthContext } from "./context/AuthContext";
 import RegisterPage from "./page/Register/RegisterPage";
-import Sidebar from "./component/common/Sidebar";
+import Sidebar from "./component/partials/Sidebar";
 import AccountPage from "./page/Account/AccountPage";
 import ResetPasswordPage from "./page/ResetPassword/ResetPasswordPage";
+import ClassesListPage from "./page/Class/ClassesListPage";
 
 function PrivatePage({ element }) {
   const { token, user } = useContext(AuthContext);
@@ -74,7 +74,10 @@ function App() {
               path="/verification"
               element={<PublicPage element={<VerificationPage />} />}
             />
-            <Route path="/" element={<PrivatePage element={<HomePage />} />} />
+            <Route
+              path="/"
+              element={<PrivatePage element={<ClassesListPage />} />}
+            />
             <Route
               path="/account"
               element={<PrivatePage element={<AccountPage />} />}
