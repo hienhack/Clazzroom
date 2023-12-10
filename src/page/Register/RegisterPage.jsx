@@ -1,5 +1,5 @@
 import { ErrorMessage } from "@hookform/error-message";
-import { Button, Input } from "@material-tailwind/react";
+import { Button, Input, Radio } from "@material-tailwind/react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -38,6 +38,7 @@ function RegisterPage() {
       email: "",
       password: "",
       confirm: "",
+      role: "",
     },
     mode: "onSubmit",
     reValidateMode: "onBlur",
@@ -126,7 +127,7 @@ function RegisterPage() {
                   },
                   validate: (value) => {
                     if (watch("password") != value)
-                      return "Your password do not match";
+                      return "Your passwords do not match";
                   },
                 })}
                 variant="standard"
@@ -136,6 +137,36 @@ function RegisterPage() {
               <ErrorMessage
                 errors={errors}
                 name="confirm"
+                render={({ message }) => (
+                  <small className="text-red-600 italic mb-5">{message}</small>
+                )}
+              />
+            </div>
+            <div>
+              <div className="flex gap-3 items-center">
+                <h6 className="text-blue-gray-600">You are a: </h6>
+                <Radio
+                  {...register("role", {
+                    required: {
+                      value: true,
+                      message:
+                        "You must choose your role as a student or a teacher",
+                    },
+                  })}
+                  value={"student"}
+                  color="blue"
+                  label="Student"
+                />
+                <Radio
+                  {...register("role")}
+                  value={"teacher"}
+                  color="blue"
+                  label="Teacher"
+                />
+              </div>
+              <ErrorMessage
+                errors={errors}
+                name="role"
                 render={({ message }) => (
                   <small className="text-red-600 italic mb-5">{message}</small>
                 )}
