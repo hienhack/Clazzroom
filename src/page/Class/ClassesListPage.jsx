@@ -130,7 +130,7 @@ function ClassesListPage() {
           </div>
         )}
         {!empty && (
-          <div className="h-full overflow-y-auto">
+          <div className="overflow-y-auto">
             <div className="p-6 flex flex-wrap justify-center gap-6">
               {classes.map((clazz) => (
                 <ClassCard key={clazz._id} clazz={clazz} />
@@ -156,41 +156,37 @@ function ClassesListPage() {
 
 function ListPageNavbar({ onCreateClass, onJoinClass }) {
   return (
-    <div className="bg-white px-6 h-[50px] border-b border-gray-300">
-      <div className="flex items-center h-full justify-between">
-        <h1 className="font-medium text-blue-gray-800">List of classes</h1>
-        <div className="flex gap-3 items-center">
-          <Popover placement="bottom-end">
-            <Tooltip
-              className="bg-gray-700 text-xs py-1"
-              placement="bottom"
-              content="Create or join a class"
-            >
-              <PopoverHandler>
-                <button className="p-2 -m-2 rounded-full hover:bg-blue-gray-50">
-                  <AiOutlinePlus
-                    size="1.5rem"
-                    className="w-6 h-6 fill-blue-gray-800"
-                  />
-                </button>
-              </PopoverHandler>
-            </Tooltip>
-            <PopoverContent className="w-72">
-              <List className="p-0">
-                <button onClick={onCreateClass}>
-                  <ListItem className="text-blue-gray-800">
-                    Create a new class
-                  </ListItem>
-                </button>
-                <button onClick={onJoinClass}>
-                  <ListItem className="text-blue-gray-800">
-                    Join a class
-                  </ListItem>
-                </button>
-              </List>
-            </PopoverContent>
-          </Popover>
-        </div>
+    <div className="bg-white px-6 h-[50px] min-h-[50px] border-b border-gray-300 flex items-center justify-between">
+      <h1 className="font-medium text-blue-gray-800">List of classes</h1>
+      <div className="flex h-full gap-3 items-center">
+        <Popover placement="bottom-end">
+          <Tooltip
+            className="bg-gray-700 text-xs py-1"
+            placement="bottom"
+            content="Create or join a class"
+          >
+            <PopoverHandler>
+              <button className="p-2 -m-2 rounded-full hover:bg-blue-gray-50">
+                <AiOutlinePlus
+                  size="1.5rem"
+                  className="w-6 h-6 fill-blue-gray-800"
+                />
+              </button>
+            </PopoverHandler>
+          </Tooltip>
+          <PopoverContent className="w-72">
+            <List className="p-0">
+              <button onClick={onCreateClass}>
+                <ListItem className="text-blue-gray-800">
+                  Create a new class
+                </ListItem>
+              </button>
+              <button onClick={onJoinClass}>
+                <ListItem className="text-blue-gray-800">Join a class</ListItem>
+              </button>
+            </List>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );

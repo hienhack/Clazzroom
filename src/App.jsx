@@ -10,6 +10,10 @@ import Sidebar from "./component/partials/Sidebar";
 import AccountPage from "./page/Account/AccountPage";
 import ResetPasswordPage from "./page/ResetPassword/ResetPasswordPage";
 import ClassesListPage from "./page/Class/ClassesListPage";
+import ClassPage from "./page/Class/ClassPage";
+import ClassMember from "./page/Class/ClassMember";
+import ClassDetail from "./page/Class/ClassDetail";
+import ClassGrade from "./page/Class/ClassGrade";
 
 function PrivatePage({ element }) {
   const { token, user } = useContext(AuthContext);
@@ -77,7 +81,12 @@ function App() {
             <Route
               path="/"
               element={<PrivatePage element={<ClassesListPage />} />}
-            />
+            ></Route>
+            <Route path="/class/:classId" element={<ClassPage />}>
+              <Route path="" element={<ClassDetail />}></Route>
+              <Route path="members" element={<ClassMember />} />
+              <Route path="grade" element={<ClassGrade />} />
+            </Route>
             <Route
               path="/account"
               element={<PrivatePage element={<AccountPage />} />}
