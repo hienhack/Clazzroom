@@ -14,6 +14,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdOutlineRotateRight } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
+import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
 
 const testClass = {
   class_name: "ba c av",
@@ -24,19 +26,30 @@ const testClass = {
   description: "asdf asdf sdaf sdaf sadf asd f",
 };
 
-function EditClassDialog({ open, handleOpen }) {
+function EditClassDialog({ open, handleOpen, clazz }) {
   const [processing, setProcessing] = useState(false);
   // For testing only. You must load the current class from context
-  const [classCode, setClassCode] = useState(testClass.class_code);
+  const [classCode, setClassCode] = useState(clazz.class_code);
 
   function onSubmit(data) {
     setProcessing(true);
-    data.class_code = classCode;
-
-    // Simulate requesting
-    setTimeout(() => {
-      setProcessing(false);
-    }, 3000);
+    console.log(data);
+    axios
+      .patch("/classes/" + clazz._id, data)
+      .then((res) => {
+        // Nếu yêu cầu thành công, làm mới trang
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Xử lý lỗi trong trường hợp yêu cầu thất bại
+        console.log(error);
+      })
+      .finally(() => {
+        // Kết thúc xử lý sau một khoảng thời gian nhất định (trong trường hợp này là 3000ms)
+        setTimeout(() => {
+          setProcessing(false);
+        }, 3000);
+      });
   }
 
   function generateClassCode() {
@@ -53,9 +66,6 @@ function EditClassDialog({ open, handleOpen }) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      ...testClass,
-    },
     mode: "onSubmit",
     reValidateMode: "onBlur",
   });
@@ -77,9 +87,9 @@ function EditClassDialog({ open, handleOpen }) {
             <div>
               <h6 className="text-sm text-blue-gray-400">Class code</h6>
               <div className="flex justify-between items-center mt-3">
-                {classCode != "" ? (
+                {clazz?.class_code != "" ? (
                   <h1 className="text-blue-800 text-2xl font-semibold">
-                    {classCode}
+                    {clazz?.class_code}
                   </h1>
                 ) : (
                   <h1 className="text-blue-gray-400 col-span-4 text-lg font-semibold align-top">
@@ -98,7 +108,7 @@ function EditClassDialog({ open, handleOpen }) {
                       className="fill-inherit"
                     />
                   </button>
-                  {classCode != "" && (
+                  {clazz?.class_code != "" && (
                     <button
                       type="button"
                       className="fill-blue-gray-300 hover:fill-blue-gray-600"
@@ -121,6 +131,7 @@ function EditClassDialog({ open, handleOpen }) {
                     },
                   })}
                   className="mb-4"
+                  defaultValue={clazz.class_name}
                   variant="standard"
                   label="Class name"
                 ></Input>
@@ -141,6 +152,7 @@ function EditClassDialog({ open, handleOpen }) {
                   className="mb-4"
                   variant="standard"
                   label="Topic"
+                  defaultValue={clazz.topic}
                 ></Input>
               </div>
               <div>
@@ -149,6 +161,8 @@ function EditClassDialog({ open, handleOpen }) {
                   className="mb-4"
                   variant="standard"
                   label="Room"
+                  defaultValue={clazz.room}
+
                 ></Input>
               </div>
               <div>
@@ -157,6 +171,7 @@ function EditClassDialog({ open, handleOpen }) {
                   {...register("description")}
                   variant="standard"
                   label="Class description"
+                  defaultValue={clazz.description}
                 />
               </div>
             </div>

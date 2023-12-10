@@ -2,7 +2,8 @@ import { Outlet } from "react-router-dom";
 import TabBar from "../../component/common/TabBar";
 import { Tooltip } from "@material-tailwind/react";
 import { FaRegTrashCan } from "react-icons/fa6";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ClassContext } from "../../context/ClassContext";
 
 const clazz = {
   _id: "1",
@@ -47,18 +48,19 @@ const clazz = {
 
 function ClassPage() {
   const [controller, setController] = useState();
+  const { currentClass } = useContext(ClassContext);
 
   const tabs = [
     {
-      to: `/class/${clazz._id}`,
+      to: `/class/classId=${currentClass._id}`,
       title: "Detail",
     },
     {
-      to: `/class/${clazz._id}/members`,
+      to: `/class/classId=${currentClass._id}/members`,
       title: "Members",
     },
     {
-      to: `/class/${clazz._id}/grade`,
+      to: `/class/classId=${currentClass._id}/grade`,
       title: "Grade",
     },
   ];

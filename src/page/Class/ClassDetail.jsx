@@ -1,9 +1,12 @@
 import { Tooltip } from "@material-tailwind/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
 import { IoCopySharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
 import EditClassDialog from "./EditClassDialog";
+import { useParams } from 'react-router-dom';
+import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
 
 const testClass = {
   class_name: "Phát triển ứng dụng web",
@@ -32,6 +35,7 @@ function ClassDetail() {
   const [clazz, setClazz] = useState(testClass);
   const setController = useOutletContext();
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const { setCurrentClass } = useContext(ClassContext);
 
   useEffect(() => {
     setController(
@@ -43,6 +47,21 @@ function ClassDetail() {
     navigator.clipboard.writeText(clazz.class_code);
   }, []);
 
+  const { classId } = useParams();
+  const splitted = classId?.split('classId=');
+  const url = splitted[1];
+  useEffect(() => {
+    axios
+      .get("/classes/" + url, {})
+      .then((res) => {
+        setClazz(res.data.data)
+        setCurrentClass(res.data.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <>
       <div className="p-6">
@@ -50,7 +69,7 @@ function ClassDetail() {
           <div className="py-6 px-8 h-[190px] rounded-t-xl bg-[url('/account-page-cover-image.png')] bg-center bg-cover">
             <div className="flex items-end h-full">
               <h1 className="text-white text-3xl font-semibold">
-                Phát triển ứng dụng web
+                {clazz?.class_name}
               </h1>
             </div>
           </div>
@@ -62,7 +81,7 @@ function ClassDetail() {
               {clazz.class_code != "" ? (
                 <div className="col-span-4 flex gap-4 items-center">
                   <h1 className="text-blue-800 text-2xl font-semibold align-top">
-                    asd24n23
+                    {clazz?.class_code}
                   </h1>
                   <Tooltip
                     className="bg-gray-700 text-xs py-1"
@@ -84,19 +103,16 @@ function ClassDetail() {
               )}
               <h6 className="font-medium">Topic</h6>
               <h6 className="text-blue-gray-800 col-span-4">
-                Ứng dụng ReactJS phát triển ứng dụng web
+                {clazz?.topic}
               </h6>
               <h6 className="font-medium">Room</h6>
-              <h6 className="text-blue-gray-800 col-span-4">E403</h6>
+              <h6 className="text-blue-gray-800 col-span-4">
+                {clazz?.room}
+              </h6>
               <h6 className="font-medium">Description</h6>
               <p className="text-blue-gray-900 col-span-4">
-                Ứng dụng ReactJS phát triển ứng dụng web Ứng dụng ReactJS phát
-                triển ứng dụng web. Ứng dụng ReactJS phát triển ứng dụng web.
-                Ứng dụng ReactJS phát triển ứng dụng web. Ứng dụng ReactJS phát
-                triển ứng dụng web.
-                <br />
-                Ứng dụng ReactJS phát triển ứng dụng web Ứng dụng ReactJS phát
-                triển ứng dụng web.
+                {clazz?.description}
+
               </p>
             </div>
           </div>
@@ -104,6 +120,7 @@ function ClassDetail() {
       </div>
       <EditClassDialog
         open={showEditDialog}
+        clazz={clazz}
         handleOpen={() => setShowEditDialog(false)}
       ></EditClassDialog>
     </>

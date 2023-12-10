@@ -15,11 +15,19 @@ function ClassContextProvider({ children }) {
     if (token == null) {
       return;
     }
-
+    axios
+      .get("/classes", {})
+      .then((res) => {
+        setClassList(res.data.data);
+        // console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     // get all user's classes
     //axios.get()
     // setClassList();
-  });
+  }, []);
 
   return (
     <ClassContext.Provider
@@ -29,3 +37,4 @@ function ClassContextProvider({ children }) {
     </ClassContext.Provider>
   );
 }
+export { ClassContext, ClassContextProvider };

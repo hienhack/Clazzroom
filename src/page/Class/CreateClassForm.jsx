@@ -11,7 +11,25 @@ import {
 import { useState } from "react";
 
 function CreateClassForm({ onSuccess, open, handleOpen }) {
-  const [processing, setProcessing] = useState(false);
+  const [class_name, setClassName] = useState('');
+  const [room, setRoom] = useState('');
+  const [topic, setTopic] = useState('');
+  const [description, setDescription] = useState('');
+  const [error, setError] = useState(false);
+
+  const handleCreate = () => {
+    if (class_name.trim() === '') {
+      setError(true);
+    } else {
+      setError(false);
+      onSuccess({ class_name, room, topic, description });
+    }
+  };
+
+  const handleInputChange = (e, setValue) => {
+    setValue(e.target.value);
+    setError(false);
+  };
 
   return (
     <Dialog
@@ -26,14 +44,38 @@ function CreateClassForm({ onSuccess, open, handleOpen }) {
             Create a new class
           </Typography>
           <div className="flex flex-col gap-6">
-            <Input variant="standard" label="Class name *" size="lg" />
-            <Input variant="standard" label="Room" size="lg" />
-            <Input variant="standard" label="Topic" size="lg" />
-            <Textarea variant="standard" label="Class description" />
+            <Input
+              variant="standard"
+              label="Class name *"
+              size="lg"
+              value={class_name}
+              onChange={(e) => handleInputChange(e, setClassName)}
+              error={error}
+            />
+            <Input
+              variant="standard"
+              label="Room"
+              size="lg"
+              value={room}
+              onChange={(e) => handleInputChange(e, setRoom)}
+            />
+            <Input
+              variant="standard"
+              label="Topic"
+              size="lg"
+              value={topic}
+              onChange={(e) => handleInputChange(e, setTopic)}
+            />
+            <Textarea
+              variant="standard"
+              label="Class description"
+              value={description}
+              onChange={(e) => handleInputChange(e, setDescription)}
+            />
           </div>
-          <span className="text-xs text-blue-gray-300">
-            {"(*) is required field"}
-          </span>
+          {error && (
+            <span className="text-xs text-red-500">{"Class name is required"}</span>
+          )}
         </CardBody>
         <CardFooter className="pt-0 mt-2">
           <div className="flex justify-end items-center gap-2">
@@ -51,6 +93,7 @@ function CreateClassForm({ onSuccess, open, handleOpen }) {
               size="sm"
               variant="gradient"
               color="blue"
+              onClick={handleCreate}
             >
               <span>Create</span>
             </Button>

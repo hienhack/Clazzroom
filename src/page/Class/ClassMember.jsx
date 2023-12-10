@@ -8,7 +8,7 @@ import {
   DialogHeader,
   Tooltip,
 } from "@material-tailwind/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useContext } from "react";
 import { FaRegTrashCan } from "react-icons/fa6";
 import {
   MdOutlineGroupAdd,
@@ -18,6 +18,7 @@ import {
 import { IoClose } from "react-icons/io5";
 import { useOutletContext } from "react-router-dom";
 import InvitationDialog from "./InvitationDialog";
+import { ClassContext } from "../../context/ClassContext";
 
 function ControlButtons({
   enableRemove,
@@ -104,10 +105,12 @@ function ControlButtons({
 function ClassMember() {
   const setController = useOutletContext();
   const [removeList, setRemoveList] = useState([]);
+  const [classMember, setClassMember] = useState([]);
   const [removing, setRemoving] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const { currentClass } = useContext(ClassContext);
 
   function enableRemove() {
     setRemoving(true);
@@ -150,6 +153,12 @@ function ClassMember() {
     );
   }, [handleRemove]);
 
+  useEffect(() => {
+    // console.log(classList);
+    setClassMember(currentClass);
+    console.log(currentClass);
+  }, [currentClass]);
+
   console.log(showInviteDialog);
 
   return (
@@ -160,24 +169,28 @@ function ClassMember() {
             <h1 className="text-xl">Teacher</h1>
             <hr className="border-gray-300 my-5"></hr>
             <div className="flex flex-col gap-3">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <Avatar size="sm" src="/default-user-image.png" />
-                  <div className="flex flex-col">
-                    <h6 className="text-sm">Hien Thai</h6>
-                    <small className="text-xs text-gray-600">
-                      hienthai@gmail.com
-                    </small>
+              {classMember?.teachers?.map((teacher) => (
+                <div className="flex justify-between items-center" key={teacher._id} >
+                  <div className="flex items-center gap-3">
+                    <Avatar size="sm" src="/default-user-image.png" />
+                    <div className="flex flex-col">
+                      <h6 className="text-sm">{teacher.full_name}</h6>
+                      <small className="text-xs text-gray-600">
+                        {teacher.email}
+                      </small>
+                    </div>
                   </div>
+                  {removing && (
+                    <Checkbox
+                      className="p-1 -m-1"
+                      color="indigo"
+                      onClick={handleRemoveCheckbox}
+                    />
+                  )}
                 </div>
-                {removing && (
-                  <Checkbox
-                    className="p-1 -m-1"
-                    color="indigo"
-                    onClick={handleRemoveCheckbox}
-                  />
-                )}
-              </div>
+              ))}
+
+
             </div>
           </div>
           <div className="mt-12">

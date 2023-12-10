@@ -14,9 +14,9 @@ function ClassCard({ clazz }) {
 
   return (
     <div className="bg-white rounded-md border border-gray-300 w-[300px]">
-      <Link to={"/class/" + clazz.id}>
+      <Link to={"/class/classId=" + clazz._id}>
         <div className="text-white rounded-t-md p-4 hover:underline bg-light-blue-900">
-          <h1 className="w-full truncate text-lg font-medium">{clazz.name}</h1>
+          <h1 className="w-full truncate text-lg font-medium">{clazz.class_name}</h1>
           <h6 className="w-full truncate text-xs mt-3">{clazz.topic}</h6>
         </div>
       </Link>
@@ -50,10 +50,10 @@ function ClassCard({ clazz }) {
         )}
         <div className="grid grid-cols-3 mt-3 text-blue-gray-700">
           <h6 className="text-xs">
-            Teachers: <b>{clazz.teachers.length}</b>
+            Teachers: <b>{clazz.teacher_count}</b>
           </h6>
           <h6 className="text-xs">
-            Students: <b>{clazz.students.length}</b>
+            Students: <b>{clazz.student_count}</b>
           </h6>
         </div>
       </div>
