@@ -8,22 +8,28 @@ import {
   Typography,
   Input,
 } from "@material-tailwind/react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
 
 function InvitationDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
+  const { currentClass } = useContext(ClassContext);
 
-  function onSubmit(data) {
+  const onSubmit = async (data) => {
     setProcessing(true);
-
-    // Simulate requesting
-    setTimeout(() => {
+    try {
+      const response = await axios.post(`/classes/${currentClass._id}/request-send-invitation`, { emails: [data] });
+      console.log(response.data); // Xử lý dữ liệu phản hồi nếu cần thiết
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
       setProcessing(false);
-      setFocus("email");
-      reset();
-    }, 3000);
-  }
+      handleOpen();
+    }
+  };
+
 
   const {
     register,

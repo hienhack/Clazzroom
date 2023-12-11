@@ -119,7 +119,16 @@ function ClassesListPage() {
 
   }
 
-  function handleJoinClass() { }
+  function handleJoinClass(formData) {
+    axios
+      .post("/classes/join", { class_code: formData })
+      .then((res) => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
 
   // Loading class
   useEffect(() => {
