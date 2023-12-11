@@ -12,9 +12,13 @@ function ClassContextProvider({ children }) {
   const [classList, setClassList] = useState([]);
 
   useEffect(() => {
+    console.log(token);
+
+
     if (token == null) {
       return;
     }
+    localStorage.setItem("token", token);
     axios
       .get("/classes", {})
       .then((res) => {
@@ -27,7 +31,7 @@ function ClassContextProvider({ children }) {
     // get all user's classes
     //axios.get()
     // setClassList();
-  }, []);
+  }, [token]);
 
   return (
     <ClassContext.Provider
