@@ -8,7 +8,7 @@ const ClassContext = createContext();
 
 function ClassContextProvider({ children }) {
   const { token } = useContext(AuthContext);
-  const [currentClass, setCurrentClass] = useState(-1);
+  const [currentClass, setCurrentClass] = useState(JSON.parse(localStorage.getItem("currentClass")) || -1);
   const [classList, setClassList] = useState([]);
 
   useEffect(() => {

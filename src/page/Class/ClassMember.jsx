@@ -196,7 +196,28 @@ function ClassMember() {
           <div className="mt-12">
             <h1 className="text-xl">Student</h1>
             <hr className="border-gray-300 my-5"></hr>
-            <div className="flex flex-col gap-3"></div>
+            <div className="flex flex-col gap-3">
+              {classMember?.students?.map((student) => (
+                <div className="flex justify-between items-center" key={student._id} >
+                  <div className="flex items-center gap-3">
+                    <Avatar size="sm" src="/default-user-image.png" />
+                    <div className="flex flex-col">
+                      <h6 className="text-sm">{student.full_name}</h6>
+                      <small className="text-xs text-gray-600">
+                        {student.email}
+                      </small>
+                    </div>
+                  </div>
+                  {removing && (
+                    <Checkbox
+                      className="p-1 -m-1"
+                      color="indigo"
+                      onClick={handleRemoveCheckbox}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

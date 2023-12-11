@@ -20,7 +20,7 @@ function InvitationDialog({ open, handleOpen }) {
   const onSubmit = async (data) => {
     setProcessing(true);
     try {
-      const response = await axios.post(`/classes/${currentClass._id}/request-send-invitation`, { emails: [data] });
+      const response = await axios.post(`/classes/${currentClass._id}/request-send-invitation`, [data]);
       console.log(response.data); // Xử lý dữ liệu phản hồi nếu cần thiết
     } catch (error) {
       console.error("Error:", error);

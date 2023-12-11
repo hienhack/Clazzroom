@@ -54,8 +54,9 @@ function ClassDetail() {
     axios
       .get("/classes/" + url, {})
       .then((res) => {
-        setClazz(res.data.data)
+        setClazz(res.data.data);
         setCurrentClass(res.data.data);
+        localStorage.setItem("currentClass", JSON.stringify(res.data.data));
       })
       .catch((error) => {
         console.log(error);
