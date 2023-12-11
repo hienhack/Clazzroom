@@ -23,6 +23,7 @@ function JoinClass() {
           .get(`/classes/${classId}`, {})
           .then(() => {
             setClassList([...classList, res.data.data]);
+            navigate(`/classes/${classId}`);
           })
           .catch((error) => {});
       })
