@@ -56,12 +56,14 @@ function AccountPage() {
                   value={" "}
                   readOnly={true}
                 ></Input>
-                <Input
-                  label="Student ID"
-                  variant="standard"
-                  value={" "}
-                  readOnly={true}
-                ></Input>
+                {user?.role == "student" && (
+                  <Input
+                    label="Student ID"
+                    variant="standard"
+                    value={" "}
+                    readOnly={true}
+                  ></Input>
+                )}
               </div>
             </div>
             <div>

@@ -19,17 +19,21 @@ function InvitationDialog({ open, handleOpen }) {
 
   const onSubmit = async (data) => {
     setProcessing(true);
-    try {
-      const response = await axios.post(`/classes/${currentClass._id}/request-send-invitation`, [data]);
-      console.log(response.data); // Xử lý dữ liệu phản hồi nếu cần thiết
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setProcessing(false);
-      handleOpen();
-    }
-  };
 
+    axios
+      .post(`/classes/${currentClass._id}/request-send-invitation`, [data])
+      .then((res) => {
+        setFocus("email");
+        reset();
+      })
+      .catch((error) => {
+        alert(error.reponse.data.message);
+        setFocus();
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  };
 
   const {
     register,

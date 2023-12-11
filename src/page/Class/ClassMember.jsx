@@ -18,8 +18,10 @@ import {
 import { useOutletContext } from "react-router-dom";
 import InvitationDialog from "./InvitationDialog";
 import { ClassContext } from "../../context/ClassContext";
+import { AuthContext } from "../../context/AuthContext";
 
 function ControlButtons({
+  isTeacher,
   enableRemove,
   cancelRemove,
   handleRemove,
@@ -46,7 +48,7 @@ function ControlButtons({
       <Tooltip
         className="bg-gray-700 text-xs py-1"
         placement="bottom"
-        content="Add teacher/student"
+        content="Invite teacher/student"
       >
         <button
           className="fill-blue-gray-300 hover:fill-blue-gray-600"
@@ -55,7 +57,7 @@ function ControlButtons({
           <MdOutlineGroupAdd size="1.4rem" className="fill-inherit" />
         </button>
       </Tooltip>
-      {!removing && (
+      {!removing && isTeacher && (
         <Tooltip
           className="bg-gray-700 text-xs py-1"
           placement="bottom"
@@ -108,6 +110,7 @@ function ClassMember() {
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const { currentClass, setCurrentClass } = useContext(ClassContext);
+  const { user } = useContext(AuthContext);
   const [processing, setProcessing] = useState(false);
 
   function enableRemove() {
@@ -139,15 +142,20 @@ function ClassMember() {
   }
 
   useEffect(() => {
+    if (user == null) {
+      setController(null);
+      return;
+    }
     setController(
       <ControlButtons
+        isTeacher={user.role == "teacher"}
         enableRemove={enableRemove}
         cancelRemove={cancelRemove}
         handleRemove={handleRemove}
         handleInvite={() => setShowInviteDialog(true)}
       />
     );
-  }, [handleRemove]);
+  }, [handleRemove, user]);
 
   return (
     <>

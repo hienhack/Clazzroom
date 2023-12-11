@@ -5,6 +5,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
 import EditClassDialog from "./EditClassDialog";
 import { ClassContext } from "../../context/ClassContext";
+import { AuthContext } from "../../context/AuthContext";
 
 function ControlButton({ handleEditClass }) {
   return (
@@ -27,12 +28,18 @@ function ClassDetail() {
   const setController = useOutletContext();
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { currentClass } = useContext(ClassContext);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
+    if (currentClass == null) {
+      setController(null);
+      return;
+    }
+    if (user._id != currentClass.owner._id) return;
     setController(
       <ControlButton handleEditClass={() => setShowEditDialog(true)} />
     );
-  }, []);
+  }, [currentClass]);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(currentClass.class_code);
