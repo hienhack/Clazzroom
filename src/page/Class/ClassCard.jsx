@@ -5,7 +5,6 @@ import { useContext } from "react";
 
 function ClassCard({ clazz }) {
   const { user } = useContext(AuthContext);
-  console.log(clazz);
 
   return (
     <div className="bg-white rounded-md border border-gray-300 w-[300px]">

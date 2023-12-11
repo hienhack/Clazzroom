@@ -24,9 +24,10 @@ function ClassPage() {
         navigate("/errors/not-found", { replace: true });
       });
     return () => {
+      if (currentClass == null) return;
       setCurrentClass(null);
     };
-  }, []);
+  }, [currentClass]);
 
   const tabs = [
     {
