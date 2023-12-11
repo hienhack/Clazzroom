@@ -19,9 +19,7 @@ function ClassProvider({ children }) {
       .then((res) => {
         setClassList(res.data.data);
       })
-      .catch((error) => {
-        console.log(error);
-      });
+      .catch((error) => {});
   }, [token]);
 
   return (

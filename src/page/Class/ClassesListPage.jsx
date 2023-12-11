@@ -14,92 +14,7 @@ import ClassCard from "./ClassCard";
 import axios from "axios";
 import { ClassContext } from "../../context/ClassContext";
 
-// Test classes
-// const classesData = [
-//   {
-//     _id: "1",
-//     name: "Advanced web development",
-//     topic: "Using ReactJS to develop web application",
-//     grade_status: "Open",
-//     owner: {
-//       _id: "abcd",
-//       full_name: "Thai Hien",
-//       image: "",
-//       email: "hienthai@gmail.com",
-//     },
-//     teachers: [
-//       {
-//         _id: "1233",
-//         full_name: "Toi Ten La",
-//         email: "toitenla@gmail.com",
-//         image: "",
-//       },
-//       {
-//         _id: "1234",
-//         full_name: "No Name Man",
-//         email: "noname@gmail.com",
-//         image: "",
-//       },
-//     ],
-//     students: [
-//       {
-//         _id: "1233",
-//         full_name: "Toi Ten La",
-//         email: "toitenla@gmail.com",
-//         image: "",
-//       },
-//       {
-//         _id: "1234",
-//         full_name: "No Name Man",
-//         email: "noname@gmail.com",
-//         image: "",
-//       },
-//     ],
-//   },
-//   {
-//     _id: "2",
-//     name: "Advanced web development",
-//     topic: "Using ReactJS to develop web application",
-//     grade_status: "Open",
-//     owner: {
-//       _id: "abc",
-//       full_name: "Hien Thai",
-//       image: "",
-//       email: "hienthai@gmail.com",
-//     },
-//     teachers: [
-//       {
-//         _id: "1233",
-//         full_name: "Toi Ten La",
-//         email: "toitenla@gmail.com",
-//         image: "",
-//       },
-//       {
-//         _id: "1234",
-//         full_name: "No Name Man",
-//         email: "noname@gmail.com",
-//         image: "",
-//       },
-//     ],
-//     students: [
-//       {
-//         _id: "1233",
-//         full_name: "Toi Ten La",
-//         email: "toitenla@gmail.com",
-//         image: "",
-//       },
-//       {
-//         _id: "1234",
-//         full_name: "No Name Man",
-//         email: "noname@gmail.com",
-//         image: "",
-//       },
-//     ],
-//   },
-// ];
-
 function ClassesListPage() {
-  const [classes, setClasses] = useState([]);
   const [empty, setEmpty] = useState(false);
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -114,9 +29,8 @@ function ClassesListPage() {
         window.location.reload();
       })
       .catch((error) => {
-        console.log(error)
-      })
-
+        console.log(error);
+      });
   }
 
   function handleJoinClass(formData) {
@@ -129,12 +43,6 @@ function ClassesListPage() {
         console.log(error);
       });
   }
-
-  // Loading class
-  useEffect(() => {
-    // console.log(classList);
-    setClasses(classList);
-  }, [classList]);
 
   return (
     <div className="w-full bg-gray-100 h-[calc(100vh-66px)]">
@@ -159,7 +67,7 @@ function ClassesListPage() {
         {!empty && (
           <div className="overflow-y-auto">
             <div className="p-6 flex flex-wrap justify-center gap-6">
-              {classes?.map((clazz) => (
+              {classList?.map((clazz) => (
                 <ClassCard key={clazz?._id} clazz={clazz} />
               ))}
             </div>

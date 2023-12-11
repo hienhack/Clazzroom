@@ -35,7 +35,7 @@ function ClassDetail() {
   }, []);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(clazz.class_code);
+    navigator.clipboard.writeText(currentClass.class_code);
   }, []);
 
   return (
