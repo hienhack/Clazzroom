@@ -1,16 +1,11 @@
-import { useContext } from "react";
-import { AuthContext } from "../../context/AuthContext";
 import { Avatar } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
+import { useContext } from "react";
 
 function ClassCard({ clazz }) {
-  // const { user } = useContext(AuthContext);
-  const user = {
-    role: "teacher",
-    email: "hienthai@gmail.com",
-    full_name: "Hien Thai",
-    _id: "abc",
-  };
+  const { user } = useContext(AuthContext);
+  console.log(clazz);
 
   return (
     <div className="bg-white rounded-md border border-gray-300 w-[300px]">
@@ -34,11 +29,7 @@ function ClassCard({ clazz }) {
           <div className="flex gap-3 items-center">
             <Avatar
               size="sm"
-              src={
-                clazz.owner.image != ""
-                  ? clazz.owner.image
-                  : "/default-user-image.png"
-              }
+              src={clazz.owner.image || "/default-user-image.png"}
             />
             <div className="flex flex-col justify-center">
               <h6 className="text-blue-gray-700 text-sm">
