@@ -5,18 +5,18 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import axiosConfig from "./config/axios.config.js";
 import { AuthProvider } from "./context/AuthContext.jsx";
-import { ClassContextProvider } from "./context/ClassContext.jsx";
+import { ClassProvider } from "./context/ClassContext.jsx";
 
 axiosConfig();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <ClassContextProvider>
+      <ClassProvider>
         <BrowserRouter>
           <App />
         </BrowserRouter>
-      </ClassContextProvider>
+      </ClassProvider>
     </AuthProvider>
   </React.StrictMode>
 );

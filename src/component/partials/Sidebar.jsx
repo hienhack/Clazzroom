@@ -59,7 +59,7 @@ function Sidebar({ open }) {
         <MenuItem
           isChosen={false}
           content="Grade review"
-          link={{ path: "/class/1/members", isEnd: true }}
+          link={{ path: "/review", isEnd: true }}
           open={open}
         >
           <MdOutlineRateReview size="1.5rem" className="fill-inherit" />
@@ -77,13 +77,6 @@ function Sidebar({ open }) {
               <FaGraduationCap size="1.2rem" className="fill-inherit" />
             </MenuItem>
           ))}
-          {/* <MenuItem
-            isChosen={false}
-            content="das fasd fasd fasd fsad fsad fsad f sdafsda f sdf "
-            link="/"
-          >
-            <FaGraduationCap size="1.2rem" className="fill-inherit" />
-          </MenuItem> */}
         </div>
       </div>
     </div>
