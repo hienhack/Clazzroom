@@ -50,6 +50,8 @@ function ClassDetail() {
   const { classId } = useParams();
   const splitted = classId?.split('classId=');
   const url = splitted[1];
+  let { joinCode } = useParams();
+
   useEffect(() => {
     axios
       .get("/classes/" + url, {})
@@ -61,6 +63,17 @@ function ClassDetail() {
       .catch((error) => {
         console.log(error);
       });
+    console.log(joinCode);
+    if (joinCode) {
+      axios
+        .post("/classes/join", { class_code: joinCode })
+        .then((res) => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }, []);
 
   return (

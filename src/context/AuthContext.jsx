@@ -15,6 +15,7 @@ function AuthProvider({ children }) {
 
   function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("currentClass");
     setToken(null);
     setUser(null);
   }
