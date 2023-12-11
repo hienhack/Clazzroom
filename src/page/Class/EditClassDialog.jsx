@@ -1,0 +1,214 @@
+import { ErrorMessage } from "@hookform/error-message";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Dialog,
+  Typography,
+  Input,
+  Textarea,
+} from "@material-tailwind/react";
+import { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
+import { MdOutlineRotateRight } from "react-icons/md";
+import { FaRegTrashCan } from "react-icons/fa6";
+import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
+
+function EditClassDialog({ open, handleOpen }) {
+  const [processing, setProcessing] = useState(false);
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
+  const [classCode, setClassCode] = useState(currentClass?.class_code || "");
+
+  function onSubmit(data) {
+    setProcessing(true);
+    data.class_code = classCode;
+    axios
+      .patch("/classes/" + currentClass._id, data)
+      .then((res) => {
+        // Nếu yêu cầu thành công, làm mới trang
+        window.location.reload();
+      })
+      .catch((error) => {
+        // Xử lý lỗi trong trường hợp yêu cầu thất bại
+        console.log(error);
+      })
+      .finally(() => {
+        // Kết thúc xử lý sau một khoảng thời gian nhất định (trong trường hợp này là 3000ms)
+        setTimeout(() => {
+          setProcessing(false);
+        }, 3000);
+      });
+  }
+
+  function generateClassCode() {
+    axios
+      .get("/classes/generate-class_code", {})
+      .then((res) => {
+        setClassCode(res.data.data.class_code);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function removeClassCode() {
+    setClassCode("");
+  }
+
+  function handleCancel() {
+    setClassCode(currentClass.class_code);
+    reset(currentClass);
+    handleOpen();
+  }
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      class_name: currentClass?.class_name,
+      topic: currentClass?.topic,
+      room: currentClass?.room,
+      description: currentClass?.description,
+    },
+    mode: "onSubmit",
+    reValidateMode: "onBlur",
+  });
+
+  return (
+    <Dialog
+      size="md"
+      open={open}
+      handler={handleOpen}
+      dismiss={{ enabled: !processing }}
+      className="bg-transparent shadow-none z-0"
+    >
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card className="mx-auto p-2 w-full">
+          <CardBody className="flex flex-col gap-6">
+            <Typography className="mb-3" variant="h4" color="blue-gray">
+              Edit class information
+            </Typography>
+            <div>
+              <h6 className="text-sm text-blue-gray-400">Class code</h6>
+              <div className="flex justify-between items-center mt-3">
+                {classCode != "" ? (
+                  <h1 className="text-blue-800 text-2xl font-semibold">
+                    {classCode}
+                  </h1>
+                ) : (
+                  <h1 className="text-blue-gray-400 col-span-4 text-lg font-semibold align-top">
+                    Removed
+                  </h1>
+                )}
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    className="fill-blue-gray-300 hover:fill-blue-gray-600"
+                    title="Generate new class code"
+                    onClick={generateClassCode}
+                  >
+                    <MdOutlineRotateRight
+                      size="1.4rem"
+                      className="fill-inherit"
+                    />
+                  </button>
+                  {classCode != "" && (
+                    <button
+                      type="button"
+                      className="fill-blue-gray-300 hover:fill-blue-gray-600"
+                      title="Remove class code"
+                      onClick={removeClassCode}
+                    >
+                      <FaRegTrashCan size="1.2rem" className="fill-inherit" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-8">
+              <div>
+                <Input
+                  {...register("class_name", {
+                    required: {
+                      value: true,
+                      message: "Class name is required!",
+                    },
+                  })}
+                  className="mb-4"
+                  variant="standard"
+                  label="Class name"
+                ></Input>
+                <ErrorMessage
+                  errors={errors}
+                  name="class_name"
+                  render={({ message }) => (
+                    <small className="text-red-600 italic mb-5">
+                      {message}
+                    </small>
+                  )}
+                />
+              </div>
+
+              <div>
+                <Input
+                  {...register("topic")}
+                  className="mb-4"
+                  variant="standard"
+                  label="Topic"
+                ></Input>
+              </div>
+              <div>
+                <Input
+                  {...register("room")}
+                  className="mb-4"
+                  variant="standard"
+                  label="Room"
+                ></Input>
+              </div>
+              <div>
+                <Textarea
+                  rows={8}
+                  {...register("description")}
+                  variant="standard"
+                  label="Class description"
+                />
+              </div>
+            </div>
+          </CardBody>
+          <CardFooter className="pt-0 mt-2">
+            <div className="flex justify-end items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="text"
+                color="red"
+                onClick={handleCancel}
+                className="normal-case rounded-md"
+                disabled={processing}
+              >
+                <span>Cancel</span>
+              </Button>
+              <Button
+                type="submit"
+                className="normal-case rounded-md"
+                size="sm"
+                variant="gradient"
+                color="blue"
+                disabled={processing}
+              >
+                <span>{processing ? "Saving..." : "Save"}</span>
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      </form>
+    </Dialog>
+  );
+}
+
+export default EditClassDialog;

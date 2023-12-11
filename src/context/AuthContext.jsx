@@ -6,6 +6,7 @@ const AuthContext = createContext();
 function AuthProvider({ children }) {
   const [user, setUser] = useState();
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [redirect, setRedirect] = useState(null);
 
   function login(loginData) {
     localStorage.setItem("token", loginData.token);
@@ -15,6 +16,7 @@ function AuthProvider({ children }) {
 
   function logout() {
     localStorage.removeItem("token");
+    localStorage.removeItem("currentClass");
     setToken(null);
     setUser(null);
   }
@@ -35,7 +37,9 @@ function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ login, logout, setUser, user, token }}>
+    <AuthContext.Provider
+      value={{ login, logout, setUser, user, token, redirect, setRedirect }}
+    >
       {children}
     </AuthContext.Provider>
   );

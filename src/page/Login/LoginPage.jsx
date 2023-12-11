@@ -22,11 +22,10 @@ const token_url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
 
 function LoginPage() {
   const [registerNeeded, setRegisterNeeded] = useState();
-  const { setUser } = useContext(AuthContext);
   const [loadedUser, setLoadeUser] = useState();
   const [forgotPw, setForgotPw] = useState(false);
   const [error, setError] = useState();
-  const { login: loginToContext } = useContext(AuthContext);
+  const { login: loginToContext, redirect } = useContext(AuthContext);
   const [sending, setSending] = useState(false);
   const navigate = useNavigate();
 
@@ -37,7 +36,11 @@ function LoginPage() {
       .post(url, data)
       .then((res) => {
         loginToContext(res.data.data);
-        navigate("/");
+        if (redirect != null) {
+          window.location.href = redirect;
+        } else {
+          navigate("/");
+        }
       })
       .catch((error) => {
         if (!errorHandler) return;
@@ -117,9 +120,6 @@ function LoginPage() {
             login("google", { gg_id }, (error) => {
               if (error?.response?.status === 401) {
                 const user = { gg_id, full_name, email, image };
-
-                // setUser(user);
-                // setRegisterNeeded(true);
 
                 axios.post("/users/register", user).then((res) => {
                   login("google", user, (e) => {
@@ -241,7 +241,10 @@ function LoginPage() {
                 <hr className="grow border-blue-gray-200" />
               </div>
               <div className="grid grid-cols-2  gap-3">
-                <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800" onClick={handleLoginWithGoogle}>
+                <button
+                  className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800"
+                  onClick={handleLoginWithGoogle}
+                >
                   <FaGoogle size="1.2rem" className="fill-inherit" />
                   <span>Google</span>
                 </button>
@@ -253,13 +256,13 @@ function LoginPage() {
                   onResolve={({ provider, data }) => {
                     handleGoogleLogin(data);
                   }}
-                  onReject={(error) => { }}
+                  onReject={(error) => {}}
                 >
                   
                 </LoginSocialGoogle> */}
                 <FacebookLogin
                   appId="2580168245493289"
-                  onSuccess={(response) => { }}
+                  onSuccess={(response) => {}}
                   onFail={(error) => {
                     console.log("Login Failed!", error);
                   }}
@@ -267,28 +270,13 @@ function LoginPage() {
                     handleFacebookLogin(response);
                   }}
 
-                // )}
+                  // )}
                 >
                   <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
                     <FaFacebook size="1.2rem" className="fill-inherit" />
                     <span>Facebook</span>
                   </button>
                 </FacebookLogin>
-
-                {/* <LoginSocialFacebook
-                  appId="2580168245493289"
-                  fields="name,email,picture"
-                  onResolve={(response) => {
-                    handleFacebookLogin(response.data);
-                  }}
-                  onReject={(error) => {
-                  }}
-                >
-                  <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
-                    <FaFacebook size="1.2rem" className="fill-inherit" />
-                    <span>Facebook</span>
-                  </button>
-                </LoginSocialFacebook> */}
               </div>
               <div className="mt-10 flex gap-2 items-center">
                 <h1 className="text-sm text-gray-700">
