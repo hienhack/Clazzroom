@@ -243,7 +243,7 @@ function LoginPage() {
               <div className="grid grid-cols-2  gap-3">
                 <button
                   className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800"
-                  onClick={handleLoginWithGoogle}
+                  onClick={handleGoogleLogin}
                 >
                   <FaGoogle size="1.2rem" className="fill-inherit" />
                   <span>Google</span>
@@ -262,7 +262,7 @@ function LoginPage() {
                 </LoginSocialGoogle> */}
                 <FacebookLogin
                   appId="2580168245493289"
-                  onSuccess={(response) => {}}
+                  onSuccess={(response) => { }}
                   onFail={(error) => {
                     console.log("Login Failed!", error);
                   }}
@@ -270,7 +270,7 @@ function LoginPage() {
                     handleFacebookLogin(response);
                   }}
 
-                  // )}
+                // )}
                 >
                   <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-blue-800 hover:bg-blue-900">
                     <FaFacebook size="1.2rem" className="fill-inherit" />
