@@ -3,7 +3,7 @@ import Navbar from "./component/partials/Navbar";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import LoginPage from "./page/Login/LoginPage";
 import VerificationPage from "./page/Verification/VerificationPage";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { AuthContext } from "./context/AuthContext";
 import RegisterPage from "./page/Register/RegisterPage";
 import Sidebar from "./component/partials/Sidebar";
@@ -18,6 +18,7 @@ import WelcomePage from "./page/Login/WelcomePage";
 import ErrorPage from "./page/Error/ErrorPage";
 import NotFoundPage from "./page/Error/NotFoundPage";
 import ForbiddenPage from "./page/Error/ForbiddenPage";
+import JoinClass from "./page/Class/JoinClass";
 
 function PrivatePage({ element }) {
   const { token, user } = useContext(AuthContext);
@@ -43,17 +44,25 @@ function PublicPage({ element, restricted }) {
   return restricted && user != null ? <Navigate to="/" /> : element;
 }
 
+const isNoNavbarPaths = [
+  "/sign-in",
+  "/sign-up",
+  "/verification",
+  "/reset-password",
+  "/welcome",
+  "/errors/forbidden",
+  "/errors/not-found",
+  "/join/.*",
+];
+
 function App() {
-  const isNoNavbarPaths = [
-    "/sign-in",
-    "/sign-up",
-    "/verification",
-    "/reset-password",
-    "/welcome",
-    "/errors/forbidden",
-    "/errors/not-found",
-  ];
-  const isNoNavbar = isNoNavbarPaths.includes(useLocation().pathname);
+  const { pathname: currentPath } = useLocation();
+  const isNoNavbar = useMemo(() => {
+    return (
+      isNoNavbarPaths.findIndex((path) => currentPath.match(path) != null) != -1
+    );
+  }, [currentPath]);
+
   const [showSidebar, setShowSidebar] = useState(true);
 
   return (
@@ -94,6 +103,7 @@ function App() {
               <Route path="members" element={<ClassMember />} />
               <Route path="grade" element={<ClassGrade />} />
             </Route>
+            <Route path="/join/:classId" element={<JoinClass />} />
             <Route
               path="/account"
               element={<PrivatePage element={<AccountPage />} />}
