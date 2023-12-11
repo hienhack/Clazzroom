@@ -11,6 +11,15 @@ import { useState } from "react";
 
 function JoinClassForm({ onSuccess, open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
+  const [class_code, setClassCode] = useState('');
+
+  const handleJoin = () => {
+    onSuccess(class_code); // Truyền giá trị class_code vào hàm onSuccess
+  };
+
+  const handleInputChange = (e) => {
+    setClassCode(e.target.value); // Cập nhật giá trị của class_code khi có sự thay đổi trong input
+  };
 
   return (
     <Dialog
@@ -28,7 +37,13 @@ function JoinClassForm({ onSuccess, open, handleOpen }) {
             <h1 className="text-sm">
               Enter your class code below to join your class
             </h1>
-            <Input variant="standard" label="Class code" size="lg" />
+            <Input
+              variant="standard"
+              label="Class code"
+              size="lg"
+              value={class_code}
+              onChange={handleInputChange}
+            />
           </div>
         </CardBody>
         <CardFooter className="pt-0 mt-2">
@@ -47,6 +62,7 @@ function JoinClassForm({ onSuccess, open, handleOpen }) {
               size="sm"
               variant="gradient"
               color="blue"
+              onClick={handleJoin} // Gọi hàm handleJoin khi nhấn nút "Join"
             >
               <span>Join</span>
             </Button>
