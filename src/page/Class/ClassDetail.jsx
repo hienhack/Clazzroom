@@ -38,6 +38,39 @@ function ClassDetail() {
     );
   }, []);
 
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(clazz.class_code);
+  }, []);
+
+  const { classId } = useParams();
+  const splitted = classId?.split("classId=");
+  const url = splitted[1];
+  let { joinCode } = useParams();
+
+  useEffect(() => {
+    axios
+      .get("/classes/" + url, {})
+      .then((res) => {
+        setClazz(res.data.data);
+        setCurrentClass(res.data.data);
+        localStorage.setItem("currentClass", JSON.stringify(res.data.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    console.log(joinCode);
+    if (joinCode) {
+      axios
+        .post("/classes/join", { class_code: joinCode })
+        .then((res) => {
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, []);
+
   return (
     <>
       <div className="p-6">
