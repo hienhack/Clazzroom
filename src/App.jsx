@@ -14,6 +14,10 @@ import ClassPage from "./page/Class/ClassPage";
 import ClassMember from "./page/Class/ClassMember";
 import ClassDetail from "./page/Class/ClassDetail";
 import ClassGrade from "./page/Class/ClassGrade";
+import WelcomePage from "./page/Login/WelcomePage";
+import ErrorPage from "./page/Error/ErrorPage";
+import NotFoundPage from "./page/Error/NotFoundPage";
+import ForbiddenPage from "./page/Error/ForbiddenPage";
 
 function PrivatePage({ element }) {
   const { token, user } = useContext(AuthContext);
@@ -45,6 +49,9 @@ function App() {
     "/sign-up",
     "/verification",
     "/reset-password",
+    "/welcome",
+    "/errors/forbidden",
+    "/errors/not-found",
   ];
   const isNoNavbar = isNoNavbarPaths.includes(useLocation().pathname);
   const [showSidebar, setShowSidebar] = useState(true);
@@ -91,6 +98,11 @@ function App() {
               path="/account"
               element={<PrivatePage element={<AccountPage />} />}
             />
+            <Route path="/welcome" element={<WelcomePage />}></Route>
+            <Route path="/errors" element={<ErrorPage />}>
+              <Route path="not-found" element={<NotFoundPage />}></Route>
+              <Route path="forbidden" element={<ForbiddenPage />}></Route>
+            </Route>
           </Routes>
         </div>
       </div>
