@@ -1,7 +1,7 @@
 import { Spinner } from "@material-tailwind/react";
 import { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-
+import axios from "axios";
 function JoinClass() {
   const navigate = useNavigate();
   const { search: query } = useLocation();
@@ -13,6 +13,14 @@ function JoinClass() {
     if (classCode == null) {
       navigate(`/class/${classId}`, { replace: true });
     }
+    axios
+      .post("/classes/join", { class_code: classCode })
+      .then((res) => {
+        navigate(`/class/${classId}`, { replace: true });
+      })
+      .catch((error) => {
+        navigate("/errors/not-found")
+      });
 
     // call api here
     // sucess => navigate(`/class/${classId}`, {replace: true});

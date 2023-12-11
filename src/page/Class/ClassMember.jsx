@@ -186,7 +186,7 @@ function ClassMember() {
             <h1 className="text-xl">Student</h1>
             <hr className="border-gray-300 my-5"></hr>
             <div className="flex flex-col gap-3">
-              {currentClass?.student?.map((student) => (
+              {currentClass?.students?.map((student) => (
                 <div
                   className="flex justify-between items-center"
                   key={student._id}
