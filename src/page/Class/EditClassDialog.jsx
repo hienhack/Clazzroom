@@ -7,33 +7,22 @@ import {
   Dialog,
   Typography,
   Input,
-  Tooltip,
   Textarea,
 } from "@material-tailwind/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdOutlineRotateRight } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
 import axios from "axios";
 import { ClassContext } from "../../context/ClassContext";
 
-const testClass = {
-  class_name: "ba c av",
-  // class_code: "12n8asdf",
-  class_code: "",
-  topic: "adsfd",
-  room: "E403",
-  description: "asdf asdf sdaf sdaf sadf asd f",
-};
-
 function EditClassDialog({ open, handleOpen, clazz }) {
   const [processing, setProcessing] = useState(false);
-  // For testing only. You must load the current class from context
-  const [classCode, setClassCode] = useState(clazz.class_code);
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
+  const [classCode, setClassCode] = useState(currentClass?.class_code || "");
 
   function onSubmit(data) {
     setProcessing(true);
-    console.log(data);
     axios
       .patch("/classes/" + clazz._id, data)
       .then((res) => {
@@ -61,11 +50,24 @@ function EditClassDialog({ open, handleOpen, clazz }) {
     setClassCode("");
   }
 
+  function handleCancel() {
+    setClassCode(currentClass.class_code);
+    reset(currentClass);
+    handleOpen();
+  }
+
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
+    defaultValues: {
+      class_name: currentClass?.class_name,
+      topic: currentClass?.topic,
+      room: currentClass?.room,
+      description: currentClass?.description,
+    },
     mode: "onSubmit",
     reValidateMode: "onBlur",
   });
@@ -87,9 +89,9 @@ function EditClassDialog({ open, handleOpen, clazz }) {
             <div>
               <h6 className="text-sm text-blue-gray-400">Class code</h6>
               <div className="flex justify-between items-center mt-3">
-                {clazz?.class_code != "" ? (
+                {classCode != "" ? (
                   <h1 className="text-blue-800 text-2xl font-semibold">
-                    {clazz?.class_code}
+                    {classCode}
                   </h1>
                 ) : (
                   <h1 className="text-blue-gray-400 col-span-4 text-lg font-semibold align-top">
@@ -108,7 +110,7 @@ function EditClassDialog({ open, handleOpen, clazz }) {
                       className="fill-inherit"
                     />
                   </button>
-                  {clazz?.class_code != "" && (
+                  {classCode != "" && (
                     <button
                       type="button"
                       className="fill-blue-gray-300 hover:fill-blue-gray-600"
@@ -131,7 +133,6 @@ function EditClassDialog({ open, handleOpen, clazz }) {
                     },
                   })}
                   className="mb-4"
-                  defaultValue={clazz.class_name}
                   variant="standard"
                   label="Class name"
                 ></Input>
@@ -152,7 +153,6 @@ function EditClassDialog({ open, handleOpen, clazz }) {
                   className="mb-4"
                   variant="standard"
                   label="Topic"
-                  defaultValue={clazz.topic}
                 ></Input>
               </div>
               <div>
@@ -161,8 +161,6 @@ function EditClassDialog({ open, handleOpen, clazz }) {
                   className="mb-4"
                   variant="standard"
                   label="Room"
-                  defaultValue={clazz.room}
-
                 ></Input>
               </div>
               <div>
@@ -171,7 +169,6 @@ function EditClassDialog({ open, handleOpen, clazz }) {
                   {...register("description")}
                   variant="standard"
                   label="Class description"
-                  defaultValue={clazz.description}
                 />
               </div>
             </div>
@@ -183,7 +180,7 @@ function EditClassDialog({ open, handleOpen, clazz }) {
                 size="sm"
                 variant="text"
                 color="red"
-                onClick={handleOpen}
+                onClick={handleCancel}
                 className="normal-case rounded-md"
                 disabled={processing}
               >

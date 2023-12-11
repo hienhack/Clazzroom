@@ -4,15 +4,7 @@ import { IoCopySharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
 import EditClassDialog from "./EditClassDialog";
-import { useParams } from 'react-router-dom';
-import axios from "axios";
 import { ClassContext } from "../../context/ClassContext";
-
-const testClass = {
-  class_name: "Phát triển ứng dụng web",
-  // class_code: "asd24n23",
-  class_code: "",
-};
 
 function ControlButton({ handleEditClass }) {
   return (
@@ -32,34 +24,18 @@ function ControlButton({ handleEditClass }) {
 }
 
 function ClassDetail() {
-  const [clazz, setClazz] = useState(testClass);
   const setController = useOutletContext();
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const { setCurrentClass } = useContext(ClassContext);
+  const { currentClass } = useContext(ClassContext);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(currentClass?.class_code);
+  }, []);
 
   useEffect(() => {
     setController(
       <ControlButton handleEditClass={() => setShowEditDialog(true)} />
     );
-  }, []);
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(clazz.class_code);
-  }, []);
-
-  const { classId } = useParams();
-  const splitted = classId?.split('classId=');
-  const url = splitted[1];
-  useEffect(() => {
-    axios
-      .get("/classes/" + url, {})
-      .then((res) => {
-        setClazz(res.data.data)
-        setCurrentClass(res.data.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }, []);
 
   return (
@@ -69,7 +45,7 @@ function ClassDetail() {
           <div className="py-6 px-8 h-[190px] rounded-t-xl bg-[url('/account-page-cover-image.png')] bg-center bg-cover">
             <div className="flex items-end h-full">
               <h1 className="text-white text-3xl font-semibold">
-                {clazz?.class_name}
+                {currentClass?.class_name}
               </h1>
             </div>
           </div>
@@ -78,10 +54,10 @@ function ClassDetail() {
               <div className="h-full flex items-end">
                 <h6 className="font-medium">Class code</h6>
               </div>
-              {clazz.class_code != "" ? (
+              {currentClass?.class_code != "" ? (
                 <div className="col-span-4 flex gap-4 items-center">
                   <h1 className="text-blue-800 text-2xl font-semibold align-top">
-                    {clazz?.class_code}
+                    {currentClass?.class_code}
                   </h1>
                   <Tooltip
                     className="bg-gray-700 text-xs py-1"
@@ -103,26 +79,26 @@ function ClassDetail() {
               )}
               <h6 className="font-medium">Topic</h6>
               <h6 className="text-blue-gray-800 col-span-4">
-                {clazz?.topic}
+                {currentClass?.topic}
               </h6>
               <h6 className="font-medium">Room</h6>
               <h6 className="text-blue-gray-800 col-span-4">
-                {clazz?.room}
+                {currentClass?.room}
               </h6>
               <h6 className="font-medium">Description</h6>
               <p className="text-blue-gray-900 col-span-4">
-                {clazz?.description}
-
+                {currentClass?.description}
               </p>
             </div>
           </div>
         </div>
       </div>
-      <EditClassDialog
-        open={showEditDialog}
-        clazz={clazz}
-        handleOpen={() => setShowEditDialog(false)}
-      ></EditClassDialog>
+      {showEditDialog && (
+        <EditClassDialog
+          open={showEditDialog}
+          handleOpen={() => setShowEditDialog(false)}
+        ></EditClassDialog>
+      )}
     </>
   );
 }

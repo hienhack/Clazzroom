@@ -15,7 +15,6 @@ import {
   MdOutlineGroupRemove,
   MdClose,
 } from "react-icons/md";
-import { IoClose } from "react-icons/io5";
 import { useOutletContext } from "react-router-dom";
 import InvitationDialog from "./InvitationDialog";
 import { ClassContext } from "../../context/ClassContext";
@@ -105,12 +104,11 @@ function ControlButtons({
 function ClassMember() {
   const setController = useOutletContext();
   const [removeList, setRemoveList] = useState([]);
-  const [classMember, setClassMember] = useState([]);
   const [removing, setRemoving] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
   const [processing, setProcessing] = useState(false);
-  const { currentClass } = useContext(ClassContext);
 
   function enableRemove() {
     setRemoving(true);
@@ -128,8 +126,7 @@ function ClassMember() {
     setRemoving(false);
   }
 
-  function handleRemoveCheckbox() {
-    const userId = 1;
+  function handleRemoveCheckbox(userId) {
     if (removeList.includes(userId)) {
       setRemoveList(removeList.filter((id) => userId != id));
     } else {
@@ -142,7 +139,6 @@ function ClassMember() {
   }
 
   useEffect(() => {
-    console.log("reload");
     setController(
       <ControlButtons
         enableRemove={enableRemove}
@@ -153,14 +149,6 @@ function ClassMember() {
     );
   }, [handleRemove]);
 
-  useEffect(() => {
-    // console.log(classList);
-    setClassMember(currentClass);
-    console.log(currentClass);
-  }, [currentClass]);
-
-  console.log(showInviteDialog);
-
   return (
     <>
       <div className="p-6 h-full overflow-y-auto">
@@ -169,8 +157,11 @@ function ClassMember() {
             <h1 className="text-xl">Teacher</h1>
             <hr className="border-gray-300 my-5"></hr>
             <div className="flex flex-col gap-3">
-              {classMember?.teachers?.map((teacher) => (
-                <div className="flex justify-between items-center" key={teacher._id} >
+              {currentClass?.teachers?.map((teacher) => (
+                <div
+                  className="flex justify-between items-center"
+                  key={teacher._id}
+                >
                   <div className="flex items-center gap-3">
                     <Avatar size="sm" src="/default-user-image.png" />
                     <div className="flex flex-col">
@@ -184,19 +175,41 @@ function ClassMember() {
                     <Checkbox
                       className="p-1 -m-1"
                       color="indigo"
-                      onClick={handleRemoveCheckbox}
+                      onClick={() => handleRemoveCheckbox(teacher._id)}
                     />
                   )}
                 </div>
               ))}
-
-
             </div>
           </div>
           <div className="mt-12">
             <h1 className="text-xl">Student</h1>
             <hr className="border-gray-300 my-5"></hr>
-            <div className="flex flex-col gap-3"></div>
+            <div className="flex flex-col gap-3">
+              {currentClass?.student?.map((student) => (
+                <div
+                  className="flex justify-between items-center"
+                  key={student._id}
+                >
+                  <div className="flex items-center gap-3">
+                    <Avatar size="sm" src="/default-user-image.png" />
+                    <div className="flex flex-col">
+                      <h6 className="text-sm">{student.full_name}</h6>
+                      <small className="text-xs text-gray-600">
+                        {student.email}
+                      </small>
+                    </div>
+                  </div>
+                  {removing && (
+                    <Checkbox
+                      className="p-1 -m-1"
+                      color="indigo"
+                      onClick={() => handleRemoveCheckbox(student._id)}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

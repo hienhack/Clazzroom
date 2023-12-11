@@ -1,41 +1,50 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { AuthContext } from "./AuthContext";
 import axios from "axios";
-
-// It is the first version, the better version must be implemented using useReducer hook
 
 const ClassContext = createContext();
 
 function ClassContextProvider({ children }) {
   const { token } = useContext(AuthContext);
-  const [currentClass, setCurrentClass] = useState(-1);
+  const [currentClass, setCurrentClass] = useState(null);
   const [classList, setClassList] = useState([]);
 
+  const setCurrentClassById = useCallback((classId) => {
+    const found = classList.filter((clazz) => clazz._id == classId);
+    setCurrentClass(found[0]);
+  }, []);
+
   useEffect(() => {
-    console.log(token);
-
-
     if (token == null) {
       return;
     }
+
     localStorage.setItem("token", token);
     axios
       .get("/classes", {})
       .then((res) => {
         setClassList(res.data.data);
-        // console.log(res);
       })
       .catch((error) => {
         console.log(error);
       });
-    // get all user's classes
-    //axios.get()
-    // setClassList();
   }, [token]);
 
   return (
     <ClassContext.Provider
-      value={{ classList, currentClass, setClassList, setCurrentClass }}
+      value={{
+        classList,
+        currentClass,
+        setClassList,
+        setCurrentClass,
+        setCurrentClassById,
+      }}
     >
       {children}
     </ClassContext.Provider>
