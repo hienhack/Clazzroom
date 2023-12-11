@@ -10,7 +10,6 @@ import MoreInfoForm from "./MoreInfoForm";
 import { LoginSocialFacebook } from "reactjs-social-login";
 import { LoginSocialGoogle } from "reactjs-social-login";
 import FacebookLogin from "@greatsumini/react-facebook-login";
-
 import ForgotPasswordForm from "./ForgotPasswordForm";
 
 const LOGIN_METHOD_URL = {
@@ -51,6 +50,18 @@ function LoginPage() {
         setSending(false);
       });
   }
+
+  const LoginButton = () => {
+    const { loginWithRedirect } = useAuth0();
+    return (
+      <button
+        className="btn btn-primary btn-block"
+        onClick={() => loginWithRedirect()}
+      >
+        Log In
+      </button>
+    );
+  };
 
   function onSubmit(data) {
     login("basic", data, (error) => {
@@ -230,7 +241,15 @@ function LoginPage() {
                 <hr className="grow border-blue-gray-200" />
               </div>
               <div className="grid grid-cols-2  gap-3">
-                <LoginSocialGoogle
+                <button
+                  className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800"
+                  onClick={handleLoginWithGoogle}
+                >
+                  <FaGoogle size="1.2rem" className="fill-inherit" />
+                  <span>Google</span>
+                </button>
+
+                {/* <LoginSocialGoogle
                   client_id="808993990616-cp2jebgeusd5vdcq1nikroc95etecuim.apps.googleusercontent.com"
                   discoveryDocs="claims_supported"
                   access_type="offline"
@@ -239,11 +258,8 @@ function LoginPage() {
                   }}
                   onReject={(error) => {}}
                 >
-                  <button className="flex justify-center items-center gap-2 w-full p-[0.6rem] fill-white text-white rounded-md bg-red-700 hover:bg-red-800">
-                    <FaGoogle size="1.2rem" className="fill-inherit" />
-                    <span>Google</span>
-                  </button>
-                </LoginSocialGoogle>
+                  
+                </LoginSocialGoogle> */}
                 <FacebookLogin
                   appId="2580168245493289"
                   onSuccess={(response) => {}}
