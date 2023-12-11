@@ -17,6 +17,7 @@ function JoinClass() {
 
     if (processing) return;
 
+    setProcessing(true);
     axios
       .post("/classes/join", { class_code: classCode })
       .then((res) => {
