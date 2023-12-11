@@ -18,7 +18,7 @@ function ClassesListPage() {
   const [empty, setEmpty] = useState(false);
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
-  const { classList } = useContext(ClassContext);
+  const { classList, setClassList } = useContext(ClassContext);
 
   function handleCreateClass(formData) {
     console.log("Form data:", formData);
@@ -43,6 +43,17 @@ function ClassesListPage() {
         console.log(error);
       });
   }
+
+  useEffect(() => {
+    axios
+      .get("/classes", {})
+      .then((res) => {
+        setClassList(res.data.data);
+      })
+      .catch((error) => {
+        alert("Something went wrong, please try again!");
+      });
+  }, []);
 
   return (
     <div className="w-full bg-gray-100 h-[calc(100vh-66px)]">
