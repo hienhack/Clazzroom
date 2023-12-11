@@ -11,16 +11,18 @@ import {
 import { useContext } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { PiSignOutBold } from "react-icons/pi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 
 function AccountMenu() {
   const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   function handleSignout() {
     axios.delete("/users/logout");
     logout();
+    navigate("/sign-in");
   }
 
   return (

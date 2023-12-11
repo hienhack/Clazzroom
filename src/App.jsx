@@ -21,10 +21,11 @@ import ForbiddenPage from "./page/Error/ForbiddenPage";
 import JoinClass from "./page/Class/JoinClass";
 
 function PrivatePage({ element }) {
-  const { token, user } = useContext(AuthContext);
-  const path = useLocation().pathname;
+  const { token, user, setRedirect } = useContext(AuthContext);
+  const { pathname: path } = useLocation();
 
   if (token == null) {
+    setRedirect(window.location.href);
     return <Navigate to="/sign-in" />;
   } else if (user && !user.is_verified) {
     return path == "/verification" ? (
@@ -98,12 +99,18 @@ function App() {
               path="/"
               element={<PrivatePage element={<ClassesListPage />} />}
             ></Route>
-            <Route path="/class/:classId" element={<ClassPage />}>
+            <Route
+              path="/class/:classId"
+              element={<PrivatePage element={<ClassPage />} />}
+            >
               <Route path="" element={<ClassDetail />}></Route>
               <Route path="members" element={<ClassMember />} />
               <Route path="grade" element={<ClassGrade />} />
             </Route>
-            <Route path="/join/:classId" element={<JoinClass />} />
+            <Route
+              path="/join/:classId"
+              element={<PrivatePage element={<JoinClass />} />}
+            />
             <Route
               path="/account"
               element={<PrivatePage element={<AccountPage />} />}

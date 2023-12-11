@@ -26,7 +26,7 @@ function LoginPage() {
   const [loadedUser, setLoadeUser] = useState();
   const [forgotPw, setForgotPw] = useState(false);
   const [error, setError] = useState();
-  const { login: loginToContext } = useContext(AuthContext);
+  const { login: loginToContext, redirect } = useContext(AuthContext);
   const [sending, setSending] = useState(false);
   const navigate = useNavigate();
 
@@ -37,7 +37,11 @@ function LoginPage() {
       .post(url, data)
       .then((res) => {
         loginToContext(res.data.data);
-        navigate("/");
+        if (redirect != null) {
+          window.location.href = redirect;
+        } else {
+          navigate("/");
+        }
       })
       .catch((error) => {
         if (!errorHandler) return;
