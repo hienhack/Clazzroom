@@ -1,36 +1,34 @@
 import { Spinner } from "@material-tailwind/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
+
 function JoinClass() {
   const navigate = useNavigate();
   const { search: query } = useLocation();
   const { classId } = useParams();
-  const [processing, setProcessing] = useState(false);
+  const { classList, setClassList } = useContext(ClassContext);
 
   useEffect(() => {
     const classCode = new URLSearchParams(query).get("join_code");
-    console.log(classId + "   " + classCode);
     if (classCode == null) {
-      navigate(`/class/${classId}`, { replace: true });
+      navigate(`/errors/not-found`, { replace: true });
     }
 
-    if (processing) return;
-
-    setProcessing(true);
     axios
       .post("/classes/join", { class_code: classCode })
       .then((res) => {
-        navigate(`/class/${classId}`, { replace: true });
-        setProcessing(!processing);
+        axios
+          .get(`/classes/${classId}`, {})
+          .then(() => {
+            setClassList([...classList, res.data.data]);
+          })
+          .catch((error) => {});
       })
       .catch((error) => {
         navigate("/errors/not-found");
       });
-
-    // call api here
-    // sucess => navigate(`/class/${classId}`, {replace: true});
-    // failed => navigate("/errors/not-found")
   }, []);
 
   return (
