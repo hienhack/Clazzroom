@@ -16,15 +16,16 @@ import { FaRegTrashCan } from "react-icons/fa6";
 import axios from "axios";
 import { ClassContext } from "../../context/ClassContext";
 
-function EditClassDialog({ open, handleOpen, clazz }) {
+function EditClassDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
   const { currentClass, setCurrentClass } = useContext(ClassContext);
   const [classCode, setClassCode] = useState(currentClass?.class_code || "");
 
   function onSubmit(data) {
     setProcessing(true);
+    data.class_code = classCode;
     axios
-      .patch("/classes/" + clazz._id, data)
+      .patch("/classes/" + currentClass._id, data)
       .then((res) => {
         // Nếu yêu cầu thành công, làm mới trang
         window.location.reload();
@@ -42,8 +43,14 @@ function EditClassDialog({ open, handleOpen, clazz }) {
   }
 
   function generateClassCode() {
-    let newCode = (Math.random() + 1).toString(36).substring(2);
-    setClassCode(newCode);
+    axios
+      .get("/classes/generate-class_code", {})
+      .then((res) => {
+        setClassCode(res.data.data.class_code);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   function removeClassCode() {
