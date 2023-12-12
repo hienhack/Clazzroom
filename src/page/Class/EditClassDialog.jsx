@@ -56,6 +56,7 @@ function EditClassDialog({ open, handleOpen, currentClass, setCurrentClass }) {
   function handleCancel() {
     setClassCode(currentClass.class_code);
     reset(currentClass);
+    handleOpen();
     if (changed) {
       window.location.reload();
     }
