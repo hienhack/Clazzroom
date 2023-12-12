@@ -4,8 +4,8 @@ import { IoCopySharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
 import EditClassDialog from "./EditClassDialog";
-import { ClassContext } from "../../context/ClassContext";
 import { AuthContext } from "../../context/AuthContext";
+import { ClassContext } from "../../context/ClassContext";
 
 function ControlButton({ handleEditClass }) {
   return (
@@ -25,20 +25,21 @@ function ControlButton({ handleEditClass }) {
 }
 
 function ClassDetail() {
-  const setController = useOutletContext();
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const { currentClass } = useContext(ClassContext);
-  const { user } = useContext(AuthContext);
+  const { setController } = useOutletContext();
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
 
   useEffect(() => {
     if (currentClass == null) {
       setController(null);
       return;
     }
-    if (user._id != currentClass.owner._id) return;
+
     setController(
       <ControlButton handleEditClass={() => setShowEditDialog(true)} />
     );
+
+    return () => setController(null);
   }, [currentClass]);
 
   const handleCopy = useCallback(() => {
@@ -102,6 +103,8 @@ function ClassDetail() {
       </div>
       {showEditDialog && (
         <EditClassDialog
+          currentClass={currentClass}
+          setCurrentClass={setCurrentClass}
           open={showEditDialog}
           handleOpen={() => setShowEditDialog(false)}
         ></EditClassDialog>

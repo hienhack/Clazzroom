@@ -44,17 +44,6 @@ function ClassesListPage() {
       });
   }
 
-  useEffect(() => {
-    axios
-      .get("/classes", {})
-      .then((res) => {
-        setClassList(res.data.data);
-      })
-      .catch((error) => {
-        alert("Something went wrong, please try again!");
-      });
-  }, []);
-
   return (
     <div className="w-full bg-gray-100 h-[calc(100vh-66px)]">
       <div className="flex flex-col h-full">

@@ -6,11 +6,15 @@ const ClassContext = createContext();
 
 function ClassProvider({ children }) {
   const { token } = useContext(AuthContext);
-  const [currentClass, setCurrentClass] = useState(null);
   const [classList, setClassList] = useState([]);
+  const [currentClass, setCurrentClass] = useState(null);
 
   useEffect(() => {
     if (token == null) {
+      if (classList != null) {
+        setClassList(null);
+        setCurrentClass(null);
+      }
       return;
     }
 

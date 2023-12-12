@@ -1,8 +1,8 @@
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import TabBar from "../../component/common/TabBar";
-import { useState, useContext, useEffect } from "react";
-import { ClassContext } from "../../context/ClassContext";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
 
 function ClassPage() {
   const [controller, setController] = useState();
@@ -11,10 +11,6 @@ function ClassPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (currentClass != null) {
-      return;
-    }
-
     axios
       .get("/classes/" + classId, {})
       .then((res) => {
@@ -27,19 +23,19 @@ function ClassPage() {
       if (currentClass == null) return;
       setCurrentClass(null);
     };
-  }, [currentClass]);
+  }, [classId]);
 
   const tabs = [
     {
-      to: `/class/${currentClass?._id}`,
+      to: `/class/${classId}`,
       title: "Detail",
     },
     {
-      to: `/class/${currentClass?._id}/members`,
+      to: `/class/${classId}/members`,
       title: "Members",
     },
     {
-      to: `/class/${currentClass?._id}/grade`,
+      to: `/class/${classId}/grade`,
       title: "Grade",
     },
   ];
@@ -49,7 +45,7 @@ function ClassPage() {
       <div className="flex flex-col h-full">
         <TabBar tabs={tabs}>{controller}</TabBar>
         <div className="h-full overflow-y-auto">
-          <Outlet context={setController} />
+          <Outlet context={{ setController }} />
         </div>
       </div>
     </div>

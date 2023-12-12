@@ -27,7 +27,7 @@ function Navbar({ handleSidebar }) {
               <h1 className="text-xl font-semibold text-gray-500">Clazzroom</h1>
             </div>
           </Link>
-          {currentClass && (
+          {/* {currentClass && (
             <>
               <MdKeyboardArrowRight
                 size="1.2rem"
@@ -52,7 +52,7 @@ function Navbar({ handleSidebar }) {
                 </div>
               </Link>
             </>
-          )}
+          )} */}
         </div>
         <div className="flex gap-4 items-center">
           <button className="p-2 -m-2 rounded-full hover:bg-blue-gray-50 fill-blue-gray-300 hover:fill-blue-gray-600">

@@ -104,11 +104,11 @@ function ControlButtons({
 }
 
 function ClassMember() {
-  const setController = useOutletContext();
   const [removeList, setRemoveList] = useState([]);
   const [removing, setRemoving] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const { setController } = useOutletContext();
   const { currentClass, setCurrentClass } = useContext(ClassContext);
   const { user } = useContext(AuthContext);
   const [processing, setProcessing] = useState(false);
@@ -155,6 +155,8 @@ function ClassMember() {
         handleInvite={() => setShowInviteDialog(true)}
       />
     );
+
+    return () => setController(null);
   }, [handleRemove, user]);
 
   return (

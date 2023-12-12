@@ -9,36 +9,32 @@ import {
   Input,
   Textarea,
 } from "@material-tailwind/react";
-import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { MdOutlineRotateRight } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
 import axios from "axios";
-import { ClassContext } from "../../context/ClassContext";
+import { useState } from "react";
 
-function EditClassDialog({ open, handleOpen }) {
+function EditClassDialog({ open, handleOpen, currentClass, setCurrentClass }) {
   const [processing, setProcessing] = useState(false);
-  const { currentClass, setCurrentClass } = useContext(ClassContext);
+  const [changed, setChanged] = useState(false);
   const [classCode, setClassCode] = useState(currentClass?.class_code || "");
 
   function onSubmit(data) {
     setProcessing(true);
     data.class_code = classCode;
+
     axios
       .patch("/classes/" + currentClass._id, data)
       .then((res) => {
-        // Nếu yêu cầu thành công, làm mới trang
-        window.location.reload();
+        setCurrentClass(res.data.data);
+        setChanged(true);
       })
       .catch((error) => {
-        // Xử lý lỗi trong trường hợp yêu cầu thất bại
-        console.log(error);
+        alert("Something went wrong, please try again!");
       })
       .finally(() => {
-        // Kết thúc xử lý sau một khoảng thời gian nhất định (trong trường hợp này là 3000ms)
-        setTimeout(() => {
-          setProcessing(false);
-        }, 3000);
+        setProcessing(false);
       });
   }
 
@@ -60,7 +56,9 @@ function EditClassDialog({ open, handleOpen }) {
   function handleCancel() {
     setClassCode(currentClass.class_code);
     reset(currentClass);
-    handleOpen();
+    if (changed) {
+      window.location.reload();
+    }
   }
 
   const {
@@ -84,7 +82,7 @@ function EditClassDialog({ open, handleOpen }) {
       size="md"
       open={open}
       handler={handleOpen}
-      dismiss={{ enabled: !processing }}
+      dismiss={{ enabled: false }}
       className="bg-transparent shadow-none z-0"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -191,7 +189,7 @@ function EditClassDialog({ open, handleOpen }) {
                 className="normal-case rounded-md"
                 disabled={processing}
               >
-                <span>Cancel</span>
+                <span>{changed ? "Close" : "Cancel"}</span>
               </Button>
               <Button
                 type="submit"

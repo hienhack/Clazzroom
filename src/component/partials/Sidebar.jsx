@@ -2,21 +2,14 @@ import React, { useContext } from "react";
 import { SiGoogleclassroom } from "react-icons/si";
 import { MdOutlineRateReview } from "react-icons/md";
 import { FaGraduationCap } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { ClassContext } from "../../context/ClassContext";
 
 function MenuItem({ open, link, content, children: icon }) {
-  const { setCurrentClass } = useContext(ClassContext);
   return (
     <NavLink to={link.path} end={link.isEnd}>
       {({ isActive }) => (
-        <div
-          className="pr-4"
-          onClick={() => {
-            console.log("go here");
-            setCurrentClass(null);
-          }}
-        >
+        <div className="pr-4">
           <div
             className={`pl-6 pr-4 -mr-1 rounded-r-full py-3 flex gap-6 items-center ${
               isActive ? "bg-light-blue-50" : "hover:bg-gray-100"
@@ -75,10 +68,10 @@ function Sidebar({ open }) {
         <div className={`grow overflow-y-auto ${!open && "hidden"}`}>
           {classes.map((clazz) => (
             <MenuItem
-              key={clazz._id}
+              key={clazz?._id}
               isChosen={false}
-              content={clazz.class_name}
-              link={{ path: `/class/${clazz._id}`, isEnd: false }}
+              content={clazz?.class_name}
+              link={{ path: `/class/${clazz?._id}`, isEnd: false }}
               open={open}
             >
               <FaGraduationCap size="1.2rem" className="fill-inherit" />
