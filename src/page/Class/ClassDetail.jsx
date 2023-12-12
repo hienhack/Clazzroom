@@ -1,4 +1,11 @@
-import { Tooltip } from "@material-tailwind/react";
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverHandler,
+  Tooltip,
+  Typography,
+} from "@material-tailwind/react";
 import { useCallback, useEffect, useState, useContext } from "react";
 import { IoCopySharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
@@ -42,9 +49,16 @@ function ClassDetail() {
     return () => setController(null);
   }, [currentClass]);
 
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(currentClass.class_code);
-  }, []);
+  function copy(field) {
+    const link =
+      window.location.origin +
+      "/join/" +
+      currentClass._id +
+      "?join_code=" +
+      currentClass.class_code;
+    const content = field == "class_code" ? currentClass.class_code : link;
+    navigator.clipboard.writeText(content);
+  }
 
   return (
     <>
@@ -67,18 +81,29 @@ function ClassDetail() {
                   <h1 className="text-blue-800 text-2xl font-semibold align-top">
                     {currentClass?.class_code}
                   </h1>
-                  <Tooltip
-                    className="bg-gray-700 text-xs py-1"
-                    placement="bottom"
-                    content="Copy"
-                  >
-                    <button
-                      className="fill-blue-800 hover:fill-blue-600"
-                      onClick={handleCopy}
-                    >
-                      <IoCopySharp size="1.25rem" className="fill-inherit" />
-                    </button>
-                  </Tooltip>
+
+                  <Popover placement="bottom">
+                    <PopoverHandler>
+                      <button className="fill-blue-800 hover:fill-blue-600">
+                        <IoCopySharp size="1.25rem" className="fill-inherit" />
+                      </button>
+                    </PopoverHandler>
+                    <PopoverContent className="w-fit p-0">
+                      <div className="flex flex-col items-center justify-center"></div>
+                      <button
+                        onClick={() => copy("link")}
+                        className="px-5 w-full py-2 text-center text-sm block hover:bg-gray-200 rounded-t-sm"
+                      >
+                        Copy invite link
+                      </button>
+                      <button
+                        onClick={() => copy("class_code")}
+                        className="px-5 py-2 text-center text-sm block hover:bg-gray-200 rounded-b-sm"
+                      >
+                        Copy class code
+                      </button>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               ) : (
                 <h1 className="text-blue-gray-400 col-span-4 text-lg font-semibold align-top">
