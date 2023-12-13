@@ -1,17 +1,14 @@
 import {
-  Button,
   Popover,
   PopoverContent,
   PopoverHandler,
   Tooltip,
-  Typography,
 } from "@material-tailwind/react";
-import { useCallback, useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { IoCopySharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
 import EditClassDialog from "./EditClassDialog";
-import { AuthContext } from "../../context/AuthContext";
 import { ClassContext } from "../../context/ClassContext";
 
 function ControlButton({ handleEditClass }) {
@@ -34,7 +31,7 @@ function ControlButton({ handleEditClass }) {
 function ClassDetail() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { setController } = useOutletContext();
-  const { currentClass, setCurrentClass } = useContext(ClassContext);
+  const { currentClass } = useContext(ClassContext);
 
   useEffect(() => {
     if (currentClass == null) {
@@ -63,7 +60,7 @@ function ClassDetail() {
   return (
     <>
       <div className="p-6">
-        <div className="mx-auto w-[900px] rounded-xl drop-shadow-md">
+        <div className="mx-auto w-full lg:w-[900px] rounded-xl drop-shadow-md">
           <div className="py-6 px-8 h-[190px] rounded-t-xl bg-[url('/account-page-cover-image.png')] bg-center bg-cover">
             <div className="flex items-end h-full">
               <h1 className="text-white text-3xl font-semibold">
@@ -126,14 +123,10 @@ function ClassDetail() {
           </div>
         </div>
       </div>
-      {showEditDialog && (
-        <EditClassDialog
-          currentClass={currentClass}
-          setCurrentClass={setCurrentClass}
-          open={showEditDialog}
-          handleOpen={() => setShowEditDialog(false)}
-        ></EditClassDialog>
-      )}
+      <EditClassDialog
+        open={showEditDialog}
+        handleOpen={() => setShowEditDialog(false)}
+      ></EditClassDialog>
     </>
   );
 }

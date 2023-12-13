@@ -12,13 +12,17 @@ import {
 import { useForm } from "react-hook-form";
 import { MdOutlineRotateRight } from "react-icons/md";
 import { FaRegTrashCan } from "react-icons/fa6";
+import { useContext, useEffect, useState } from "react";
+import { ClassContext } from "../../context/ClassContext";
 import axios from "axios";
-import { useState } from "react";
 
-function EditClassDialog({ open, handleOpen, currentClass, setCurrentClass }) {
+function EditClassDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
   const [changed, setChanged] = useState(false);
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
   const [classCode, setClassCode] = useState(currentClass?.class_code || "");
+
+  console.log(currentClass);
 
   function onSubmit(data) {
     setProcessing(true);
@@ -45,7 +49,7 @@ function EditClassDialog({ open, handleOpen, currentClass, setCurrentClass }) {
         setClassCode(res.data.data.class_code);
       })
       .catch((error) => {
-        console.log(error);
+        alert("Some thing went wrong. Please try again!");
       });
   }
 
@@ -57,9 +61,6 @@ function EditClassDialog({ open, handleOpen, currentClass, setCurrentClass }) {
     setClassCode(currentClass.class_code);
     reset(currentClass);
     handleOpen();
-    if (changed) {
-      window.location.reload();
-    }
   }
 
   const {
@@ -69,14 +70,16 @@ function EditClassDialog({ open, handleOpen, currentClass, setCurrentClass }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      class_name: currentClass?.class_name,
-      topic: currentClass?.topic,
-      room: currentClass?.room,
-      description: currentClass?.description,
+      ...currentClass,
     },
     mode: "onSubmit",
     reValidateMode: "onBlur",
   });
+
+  useEffect(() => {
+    reset(currentClass);
+    setClassCode(currentClass?.class_code || "");
+  }, [currentClass]);
 
   return (
     <Dialog
