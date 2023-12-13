@@ -1,10 +1,12 @@
 import "./App.css";
-import Navbar from "./component/partials/Navbar";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
+import Navbar from "./component/partials/Navbar";
 import LoginPage from "./page/Login/LoginPage";
-import VerificationPage from "./page/Verification/VerificationPage";
-import { useContext, useMemo, useState } from "react";
 import { AuthContext } from "./context/AuthContext";
+import { useContext, useMemo, useState } from "react";
+import VerificationPage from "./page/Verification/VerificationPage";
 import RegisterPage from "./page/Register/RegisterPage";
 import Sidebar from "./component/partials/Sidebar";
 import AccountPage from "./page/Account/AccountPage";
@@ -123,6 +125,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      <ToastContainer autoClose={3500} hideProgressBar theme="colored" />
     </div>
   );
 }
