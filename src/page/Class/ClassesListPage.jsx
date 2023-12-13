@@ -13,8 +13,10 @@ import JoinClassForm from "./JoinClassForm";
 import ClassCard from "./ClassCard";
 import axios from "axios";
 import { ClassContext } from "../../context/ClassContext";
+import Loading from "../../component/common/Loading";
 
 function ClassesListPage() {
+  const [loading, setLoading] = useState(true);
   const [empty, setEmpty] = useState(false);
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -44,6 +46,13 @@ function ClassesListPage() {
       });
   }
 
+  useEffect(() => {
+    if (classList != null) {
+      setLoading(false);
+      setEmpty(classList.length == 0);
+    }
+  }, [classList]);
+
   return (
     <div className="w-full bg-gray-100 h-[calc(100vh-66px)]">
       <div className="flex flex-col h-full">
@@ -51,7 +60,8 @@ function ClassesListPage() {
           onCreateClass={() => setCreating(true)}
           onJoinClass={() => setJoining(true)}
         ></ListPageNavbar>
-        {empty && (
+        {loading && <Loading></Loading>}
+        {!loading && empty && (
           <div className="grow flex flex-col justify-center items-center">
             <img className="w-36" src="/empty.png" />
             <div className="my-5 flex flex-col gap-2 items-center">
@@ -64,7 +74,7 @@ function ClassesListPage() {
             </div>
           </div>
         )}
-        {!empty && (
+        {!loading && !empty && (
           <div className="overflow-y-auto">
             <div className="p-6 flex flex-wrap justify-center gap-6">
               {classList?.map((clazz) => (

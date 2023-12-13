@@ -6,21 +6,23 @@ import { ClassContext } from "../../context/ClassContext";
 
 function ClassPage() {
   const [controller, setController] = useState();
+  const [loading, setLoading] = useState(true);
   const { currentClass, setCurrentClass } = useContext(ClassContext);
   const { classId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     axios
       .get("/classes/" + classId, {})
       .then((res) => {
         setCurrentClass(res.data.data);
+        setLoading(false);
       })
       .catch((error) => {
         navigate("/errors/not-found", { replace: true });
       });
     return () => {
-      if (currentClass == null) return;
       setCurrentClass(null);
     };
   }, [classId]);
@@ -44,8 +46,8 @@ function ClassPage() {
     <div className="h-[calc(100vh-66px)] w-full">
       <div className="flex flex-col h-full">
         <TabBar tabs={tabs}>{controller}</TabBar>
-        <div className="h-full overflow-y-auto">
-          <Outlet context={{ setController }} />
+        <div className="grow overflow-y-auto">
+          <Outlet context={{ setController, loading }} />
         </div>
       </div>
     </div>

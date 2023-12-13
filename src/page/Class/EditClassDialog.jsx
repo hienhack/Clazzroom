@@ -22,8 +22,6 @@ function EditClassDialog({ open, handleOpen }) {
   const { currentClass, setCurrentClass } = useContext(ClassContext);
   const [classCode, setClassCode] = useState(currentClass?.class_code || "");
 
-  console.log(currentClass);
-
   function onSubmit(data) {
     setProcessing(true);
     data.class_code = classCode;
