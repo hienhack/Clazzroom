@@ -1,3 +1,4 @@
+import { ErrorMessage } from "@hookform/error-message";
 import {
   Card,
   CardBody,
@@ -7,68 +8,125 @@ import {
   Dialog,
   Button,
 } from "@material-tailwind/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { useForm } from "react-hook-form";
+import { ClassContext } from "../../context/ClassContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
-function JoinClassForm({ onSuccess, open, handleOpen }) {
+function JoinClassForm({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
-  const [class_code, setClassCode] = useState('');
+  const { reloadClassList } = useContext(ClassContext);
 
-  const handleJoin = () => {
-    onSuccess(class_code); // Truyền giá trị class_code vào hàm onSuccess
-  };
+  function onSubmit(data) {
+    setProcessing(true);
+    axios
+      .post("/classes/join", { class_code: data.class_code })
+      .then((res) => {
+        setProcessing(false);
+        reloadClassList();
+        reset();
+        handleOpen();
+        toast.success("Successfully joined the class");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error(error.response.data.message);
+        setFocus("class_code");
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
+  }
 
-  const handleInputChange = (e) => {
-    setClassCode(e.target.value); // Cập nhật giá trị của class_code khi có sự thay đổi trong input
-  };
+  function handleCancel() {
+    reset();
+    handleOpen();
+  }
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setFocus,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      class_code: "",
+    },
+    mode: "onSubmit",
+    reValidateMode: "onBlur",
+  });
 
   return (
     <Dialog
       size="sm"
       open={open}
       handler={handleOpen}
+      dismiss={{ enabled: !processing }}
       className="bg-transparent shadow-none"
     >
-      <Card className="mx-auto p-2 w-full">
-        <CardBody className="flex flex-col gap-4">
-          <Typography className="mb-3" variant="h4" color="blue-gray">
-            Join a class
-          </Typography>
-          <div className="flex flex-col gap-6">
-            <h1 className="text-sm">
-              Enter your class code below to join your class
-            </h1>
-            <Input
-              variant="standard"
-              label="Class code"
-              size="lg"
-              value={class_code}
-              onChange={handleInputChange}
-            />
-          </div>
-        </CardBody>
-        <CardFooter className="pt-0 mt-2">
-          <div className="flex justify-end items-center gap-2">
-            <Button
-              size="sm"
-              variant="text"
-              color="red"
-              onClick={handleOpen}
-              className="normal-case rounded-md"
-            >
-              <span>Cancel</span>
-            </Button>
-            <Button
-              className="normal-case rounded-md"
-              size="sm"
-              variant="gradient"
-              color="blue"
-              onClick={handleJoin} // Gọi hàm handleJoin khi nhấn nút "Join"
-            >
-              <span>Join</span>
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Card className="mx-auto p-2 w-full">
+          <CardBody className="flex flex-col gap-4">
+            <Typography className="mb-3" variant="h4" color="blue-gray">
+              Join a class
+            </Typography>
+            <div className="flex flex-col gap-6">
+              <h1 className="text-sm">
+                Enter your class code below to join your class
+              </h1>
+              <div>
+                <Input
+                  {...register("class_code", {
+                    required: {
+                      value: true,
+                      message: "Class code can not be empty!",
+                    },
+                  })}
+                  className="mb-4"
+                  variant="standard"
+                  label="Class code"
+                ></Input>
+                <ErrorMessage
+                  errors={errors}
+                  name="class_code"
+                  render={({ message }) => (
+                    <small className="text-red-600 italic mb-5">
+                      {message}
+                    </small>
+                  )}
+                />
+              </div>
+            </div>
+          </CardBody>
+          <CardFooter className="pt-0 mt-2">
+            <div className="flex justify-end items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="text"
+                color="red"
+                onClick={handleCancel}
+                disabled={processing}
+                className="normal-case rounded-md"
+              >
+                <span>Cancel</span>
+              </Button>
+              <Button
+                type="submit"
+                className="normal-case rounded-md"
+                size="sm"
+                variant="gradient"
+                color="blue"
+                disabled={processing}
+              >
+                <span>{processing ? "Processing..." : "Join"}</span>
+              </Button>
+            </div>
+          </CardFooter>
+        </Card>
+      </form>
     </Dialog>
   );
 }

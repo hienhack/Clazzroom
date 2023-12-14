@@ -125,7 +125,13 @@ function App() {
           </Routes>
         </div>
       </div>
-      <ToastContainer autoClose={3500} hideProgressBar theme="colored" />
+      <ToastContainer
+        autoClose={3500}
+        hideProgressBar
+        theme="colored"
+        position="bottom-left"
+        style={{ zIndex: 999999999 }}
+      />
     </div>
   );
 }

@@ -1,20 +1,13 @@
-import {
-  Button,
-  Dialog,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
-  Spinner,
-} from "@material-tailwind/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import Loading from "../../component/common/Loading";
 
 let count = 0;
 
 function JoinClass() {
   const navigate = useNavigate();
-  const [message, setMessage] = useState();
   const { search: query } = useLocation();
   const { classId } = useParams();
 
@@ -33,58 +26,38 @@ function JoinClass() {
     axios
       .post("/classes/join", { class_code: classCode })
       .then((res) => {
-        setMessage(
-          "You are a member of this class. Click OK to visit the class now!"
-        );
+        toast.success("Successfully join the class");
+        navigate("/class/" + classId);
       })
       .catch((error) => {
         console.log(error);
         if (error.response.data.statusCode == 400) {
-          setMessage(
-            "You have joined this class before. Click OK to visit the class now!"
-          );
+          toast.info("You have joined this class before");
+          navigate("/class/" + classId);
         } else {
           navigate("/errors/not-found");
         }
       });
   }, []);
 
-  function handleOkClick() {
-    window.location.href = window.location.origin + "/class/" + classId;
-  }
-
   return (
-    <>
-      <div className="h-screen w-full bg-blue-100 pt-20">
-        <div className="flex justify-center items-center gap-3 opacity-80">
-          <Spinner className="h-6 text-blue-gray-700" />
-          <h1 className="text-blue-gray-700 text-xl">Processing...</h1>
+    <div className="h-screen w-full pt-16 bg-gray-50">
+      <div className="mx-auto w-fit h-fit mb-20">
+        <div className="flex justify-center gap-2">
+          <img className="w-[30px]" src="/logo.png" />
+          <h1 className="text-xl font-semibold text-gray-500">Clazzroom</h1>
         </div>
       </div>
-      {message && (
-        <Dialog
-          open={true}
-          size="xs"
-          handler={() => {}}
-          dismiss={{ enabled: false }}
-          className="p-3"
-        >
-          <DialogHeader>Join class</DialogHeader>
-          <DialogBody>{message}</DialogBody>
-          <DialogFooter>
-            <Button
-              className="normal-case"
-              size="sm"
-              variant="gradient"
-              color="blue"
-              onClick={handleOkClick}
-            >
-              <span>OK</span>
-            </Button>
-          </DialogFooter>
-        </Dialog>
-      )}
-    </>
+      <div className="pt-28">
+        <Loading
+          text="Processing"
+          fontSize="text-lg"
+          size="w-7 h-7"
+          width="4px"
+          bg="bg-transparent"
+        ></Loading>
+      </div>
+    </div>
   );
 }
 

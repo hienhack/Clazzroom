@@ -11,7 +11,6 @@ import { AiOutlinePlus } from "react-icons/ai";
 import CreateClassForm from "./CreateClassForm";
 import JoinClassForm from "./JoinClassForm";
 import ClassCard from "./ClassCard";
-import axios from "axios";
 import { ClassContext } from "../../context/ClassContext";
 import Loading from "../../component/common/Loading";
 
@@ -20,31 +19,7 @@ function ClassesListPage() {
   const [empty, setEmpty] = useState(false);
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState(false);
-  const { classList, setClassList } = useContext(ClassContext);
-
-  function handleCreateClass(formData) {
-    console.log("Form data:", formData);
-
-    axios
-      .post("/classes", formData)
-      .then((res) => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  function handleJoinClass(formData) {
-    axios
-      .post("/classes/join", { class_code: formData })
-      .then((res) => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  const { classList } = useContext(ClassContext);
 
   useEffect(() => {
     if (classList != null) {
@@ -87,12 +62,10 @@ function ClassesListPage() {
 
       <CreateClassForm
         open={creating}
-        onSuccess={handleCreateClass}
         handleOpen={() => setCreating(!creating)}
       ></CreateClassForm>
       <JoinClassForm
         open={joining}
-        onSuccess={handleJoinClass}
         handleOpen={() => setJoining(!joining)}
       ></JoinClassForm>
     </div>

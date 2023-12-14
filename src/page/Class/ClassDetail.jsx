@@ -4,12 +4,13 @@ import {
   PopoverHandler,
   Tooltip,
 } from "@material-tailwind/react";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { IoCopySharp } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
 import EditClassDialog from "./EditClassDialog";
 import { ClassContext } from "../../context/ClassContext";
+import { toast } from "react-toastify";
 
 function ControlButton({ handleEditClass }) {
   return (
@@ -32,13 +33,14 @@ function ClassDetail() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { loading, setController } = useOutletContext();
   const { currentClass } = useContext(ClassContext);
+  const desRef = useRef(null);
 
   useEffect(() => {
     if (currentClass == null) {
       setController(null);
       return;
     }
-
+    desRef.current.innerHTML = currentClass.description;
     setController(
       <ControlButton handleEditClass={() => setShowEditDialog(true)} />
     );
@@ -46,7 +48,7 @@ function ClassDetail() {
     return () => setController(null);
   }, [currentClass]);
 
-  function copy(field) {
+  function handleCopy(field) {
     const link =
       window.location.origin +
       "/join/" +
@@ -55,6 +57,8 @@ function ClassDetail() {
       currentClass.class_code;
     const content = field == "class_code" ? currentClass.class_code : link;
     navigator.clipboard.writeText(content);
+
+    toast.success("Copied to clipboard");
   }
 
   return (
@@ -124,13 +128,13 @@ function ClassDetail() {
                       <PopoverContent className="w-fit p-0">
                         <div className="flex flex-col items-center justify-center"></div>
                         <button
-                          onClick={() => copy("link")}
+                          onClick={() => handleCopy("link")}
                           className="px-5 w-full py-2 text-center text-sm block hover:bg-gray-200 rounded-t-sm"
                         >
                           Copy invite link
                         </button>
                         <button
-                          onClick={() => copy("class_code")}
+                          onClick={() => handleCopy("class_code")}
                           className="px-5 py-2 text-center text-sm block hover:bg-gray-200 rounded-b-sm"
                         >
                           Copy class code
@@ -152,9 +156,10 @@ function ClassDetail() {
                   {currentClass?.room}
                 </h6>
                 <h6 className="font-medium">Description</h6>
-                <p className="text-blue-gray-900 col-span-4">
-                  {currentClass?.description}
-                </p>
+                <div
+                  ref={desRef}
+                  className="text-blue-gray-900 col-span-4"
+                ></div>
               </div>
             </div>
           </div>
