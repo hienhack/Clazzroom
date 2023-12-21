@@ -14,18 +14,20 @@ import { toast } from "react-toastify";
 
 function ControlButton({ handleEditClass }) {
   return (
-    <Tooltip
-      className="bg-gray-700 text-xs py-1"
-      placement="bottom"
-      content="Edit class information"
-    >
-      <button
-        className="fill-blue-gray-300 hover:fill-blue-gray-600"
-        onClick={handleEditClass}
+    <div className="flex items-center">
+      <Tooltip
+        className="bg-gray-700 text-xs py-1"
+        placement="bottom"
+        content="Edit class information"
       >
-        <FaRegEdit size="1.3rem" className="fill-inherit" />
-      </button>
-    </Tooltip>
+        <button
+          className="fill-blue-gray-300 hover:fill-blue-gray-600"
+          onClick={handleEditClass}
+        >
+          <FaRegEdit size="1.3rem" className="fill-inherit" />
+        </button>
+      </Tooltip>
+    </div>
   );
 }
 
