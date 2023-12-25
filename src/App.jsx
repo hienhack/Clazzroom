@@ -15,19 +15,22 @@ import ClassesListPage from "./page/Class/ClassesListPage";
 import ClassPage from "./page/Class/ClassPage";
 import ClassMember from "./page/Class/ClassMember";
 import ClassDetail from "./page/Class/ClassDetail";
-import ClassGrade from "./page/Class/ClassGrade";
 import WelcomePage from "./page/Login/WelcomePage";
 import ErrorPage from "./page/Error/ErrorPage";
 import NotFoundPage from "./page/Error/NotFoundPage";
 import ForbiddenPage from "./page/Error/ForbiddenPage";
 import JoinClass from "./page/Class/JoinClass";
+import useCustomLocation from "./hook/useCustomLocation";
+import ClassGradeStructure from "./page/Class/ClassGradeStructure";
+import ClassGradeManagement from "./page/Class/ClassGradeManagement";
 
 function PrivatePage({ element }) {
   const { token, user, setRedirect } = useContext(AuthContext);
   const { pathname: path } = useLocation();
+  const { relativeHref } = useCustomLocation();
 
   if (token == null) {
-    setRedirect(window.location.href);
+    setRedirect(relativeHref);
     return <Navigate to="/sign-in" />;
   } else if (user && !user.is_verified) {
     return path == "/verification" ? (
@@ -73,13 +76,17 @@ function App() {
       {!isNoNavbar && (
         <Navbar handleSidebar={() => setShowSidebar(!showSidebar)} />
       )}
-      <div className="flex w-full">
+      <div className="flex w-screen">
         {!isNoNavbar && (
           <div>
             <Sidebar open={showSidebar} />
           </div>
         )}
-        <div className="grow bg-gray-50">
+        <div
+          className={`h-full bg-gray-50 ${
+            showSidebar ? "w-[calc(100vw-301px)]" : "w-[calc(100vw-77px)]"
+          }`}
+        >
           <Routes>
             <Route
               path="/sign-in"
@@ -107,7 +114,11 @@ function App() {
             >
               <Route path="" element={<ClassDetail />}></Route>
               <Route path="members" element={<ClassMember />} />
-              <Route path="grade" element={<ClassGrade />} />
+              <Route path="grade-structure" element={<ClassGradeStructure />} />
+              <Route
+                path="grade-management"
+                element={<ClassGradeManagement />}
+              />
             </Route>
             <Route
               path="/join/:classId"

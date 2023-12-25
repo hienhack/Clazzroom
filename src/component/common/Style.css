@@ -21,19 +21,17 @@
 .input-format:has(> div > div:focus) {
     border-width: 0 0 2px 0;
     border-color: black;
-
-    label {
-        color: #263238;
-        font-size: 0.75rem;
-        padding-top: 0;
-    }
 }
 
-.input-format:has(> div > div:not(:empty)) {
-    label {
-        font-size: 0.75rem;
-        padding-top: 0;
-    }
+.input-format:has(> div > div:focus) label {
+    color: #263238;
+    font-size: 0.75rem;
+    padding-top: 0;
+}
+
+.input-format:has(> div > div:not(:empty)) label {
+    font-size: 0.75rem;
+    padding-top: 0;
 }
 
 .input-format>label {
