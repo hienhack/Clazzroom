@@ -23,6 +23,9 @@ import JoinClass from "./page/Class/JoinClass";
 import useCustomLocation from "./hook/useCustomLocation";
 import ClassGradeStructure from "./page/Class/ClassGradeStructure";
 import ClassGradeManagement from "./page/Class/ClassGradeManagement";
+import ReviewPage from "./page/Review/ReviewPage";
+import ReviewDetail from "./page/Review/ReviewDetail";
+import ReviewList from "./page/Review/ReviewList";
 
 function PrivatePage({ element }) {
   const { token, user, setRedirect } = useContext(AuthContext);
@@ -119,6 +122,10 @@ function App() {
                 path="grade-management"
                 element={<ClassGradeManagement />}
               />
+            </Route>
+            <Route path="/review" element={<ReviewPage />}>
+              <Route path="" element={<ReviewList />} />
+              <Route path=":reviewId" element={<ReviewDetail />} />
             </Route>
             <Route
               path="/join/:classId"
