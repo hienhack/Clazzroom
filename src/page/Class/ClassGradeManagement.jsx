@@ -425,7 +425,7 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
                 />
               </div>
               <p className="text-xs font-light">
-                <b className="font-medium">Noctice:</b> Previous grades will be
+                <b className="font-medium">Notice:</b> Previous grades will be
                 lost or replaced when new grades are uploaded.
               </p>
             </div>
