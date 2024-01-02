@@ -5,6 +5,7 @@ import AccountMenu from "./AccountMenu";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { ClassContext } from "../../context/ClassContext";
+import Notification from "./Notification";
 
 function Navbar({ handleSidebar }) {
   const { currentClass } = useContext(ClassContext);
@@ -54,10 +55,8 @@ function Navbar({ handleSidebar }) {
             </>
           )}
         </div>
-        <div className="flex gap-4 items-center">
-          <button className="p-2 -m-2 rounded-full hover:bg-blue-gray-50 fill-blue-gray-300 hover:fill-blue-gray-600">
-            <FaBell size="1.3rem" className="fill-inherit" />
-          </button>
+        <div className="flex gap-2 items-center">
+          <Notification />
           <AccountMenu />
         </div>
       </div>
