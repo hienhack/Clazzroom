@@ -1,8 +1,9 @@
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import TabBar from "../../component/common/TabBar";
-import { useState, useEffect, useContext } from "react";
-import axios from "axios";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { ClassContext } from "../../context/ClassContext";
+import { AuthContext } from "../../context/AuthContext";
+import axios from "axios";
 
 const testComposition = [
   { _id: "1", state: "In-progress", name: "Addtition", scale: 10 },
@@ -15,10 +16,51 @@ function ClassPage() {
   const [controller, setController] = useState();
   const [loading, setLoading] = useState(true);
   const { setCurrentClass } = useContext(ClassContext);
+  const { user } = useContext(AuthContext);
   const [studentList, setStudentList] = useState(null);
   const [mappedAccount, setMappedAccount] = useState(null);
   const { classId } = useParams();
   const navigate = useNavigate();
+
+  const teacherTabs = useMemo(
+    () => [
+      {
+        to: `/class/${classId}`,
+        title: "Detail",
+      },
+      {
+        to: `/class/${classId}/members`,
+        title: "Members",
+      },
+      {
+        to: `/class/${classId}/grade-structure`,
+        title: "Grade Structure",
+      },
+      {
+        to: `/class/${classId}/grade-management`,
+        title: "Grade Management",
+      },
+    ],
+    [classId]
+  );
+
+  const studentTabs = useMemo(
+    () => [
+      {
+        to: `/class/${classId}`,
+        title: "Detail",
+      },
+      {
+        to: `/class/${classId}/members`,
+        title: "Members",
+      },
+      {
+        to: `/class/${classId}/grade`,
+        title: "Grade",
+      },
+    ],
+    [classId]
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -26,6 +68,7 @@ function ClassPage() {
       .get("/classes/" + classId, {})
       .then((res) => {
         const clazz = res.data.data;
+        if (clazz == null) return;
         clazz.grade_compositions = testComposition;
         setCurrentClass(clazz);
         setLoading(false);
@@ -40,29 +83,12 @@ function ClassPage() {
     };
   }, [classId]);
 
-  const tabs = [
-    {
-      to: `/class/${classId}`,
-      title: "Detail",
-    },
-    {
-      to: `/class/${classId}/members`,
-      title: "Members",
-    },
-    {
-      to: `/class/${classId}/grade-structure`,
-      title: "Grade Structure",
-    },
-    {
-      to: `/class/${classId}/grade-management`,
-      title: "Grade Management",
-    },
-  ];
-
   return (
     <div className="h-[calc(100vh-66px)] w-full">
       <div className="flex flex-col h-full w-full">
-        <TabBar tabs={tabs}>{controller}</TabBar>
+        <TabBar tabs={user?.role === "teacher" ? teacherTabs : studentTabs}>
+          {controller}
+        </TabBar>
         <div className="grow overflow-y-auto">
           <Outlet
             context={{

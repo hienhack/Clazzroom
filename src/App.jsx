@@ -26,6 +26,7 @@ import ReviewDetail from "./page/Review/ReviewDetail";
 import ReviewList from "./page/Review/ReviewList";
 import Layout from "./layout/Layout";
 import axiosConfig from "./config/axios.config";
+import ClassGrade from "./page/Class/ClassGrade";
 
 function PrivatePage({ element }) {
   const { token, user, setRedirect } = useContext(AuthContext);
@@ -96,6 +97,7 @@ function App() {
             <Route path="members" element={<ClassMember />} />
             <Route path="grade-structure" element={<ClassGradeStructure />} />
             <Route path="grade-management" element={<ClassGradeManagement />} />
+            <Route path="grade" element={<ClassGrade />} />
           </Route>
           <Route path="/review" element={<ReviewPage />}>
             <Route path="" element={<ReviewList />} />

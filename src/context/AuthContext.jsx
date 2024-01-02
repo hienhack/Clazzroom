@@ -1,5 +1,5 @@
 import axios from "axios";
-import { createContext, useLayoutEffect, useState } from "react";
+import { createContext, useEffect, useLayoutEffect, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -35,6 +35,17 @@ function AuthProvider({ children }) {
         setUser(null);
       });
   }, []);
+
+  // useEffect(() => {
+  //   if (user == null) return;
+  //   if ()
+  //   // user.isTeacher = user.role === "teacher";
+  //   setUser({
+  //     ...user,
+  //     isTeacher: user.role === "teacher",
+  //     isStudent: user.role === "student",
+  //   });
+  // }, [user]);
 
   return (
     <AuthContext.Provider
