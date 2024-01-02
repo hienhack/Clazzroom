@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
-function ChangePasswordDialog({ open, handleOpen }) {
+function MapStudentIdDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
   const { user, setUser } = useContext(AuthContext);
 
@@ -47,7 +47,7 @@ function ChangePasswordDialog({ open, handleOpen }) {
 
   return (
     <Dialog
-      size="xs"
+      size="sm"
       open={open}
       handler={handleOpen}
       dismiss={{ enabled: !processing }}
@@ -57,28 +57,24 @@ function ChangePasswordDialog({ open, handleOpen }) {
         <Card className="mx-auto p-2 w-full">
           <CardBody className="flex flex-col gap-4">
             <Typography className="mb-3" variant="h4" color="blue-gray">
-              Change password
+              Map student ID
             </Typography>
             <div className="flex flex-col gap-6">
               <div>
                 <Input
-                  {...register("current_password", {
+                  {...register("student_id", {
                     required: {
                       value: true,
-                      message: "Current password is required ",
-                    },
-                    minLength: {
-                      value: 8,
-                      message: "Password must have at last 8 characters",
+                      message: "ID cannot be empty",
                     },
                   })}
                   className="mb-4"
                   variant="standard"
-                  label="Current password"
+                  label="Student ID"
                 ></Input>
                 <ErrorMessage
                   errors={errors}
-                  name="current_password"
+                  name="student_id"
                   render={({ message }) => (
                     <small className="text-red-600 italic mb-5">
                       {message}
@@ -86,32 +82,11 @@ function ChangePasswordDialog({ open, handleOpen }) {
                   )}
                 />
               </div>
-              <div>
-                <Input
-                  {...register("new_password", {
-                    required: {
-                      value: true,
-                      message: "New password is required ",
-                    },
-                    minLength: {
-                      value: 8,
-                      message: "Password must have at last 8 characters",
-                    },
-                  })}
-                  className="mb-4"
-                  variant="standard"
-                  label="New password"
-                ></Input>
-                <ErrorMessage
-                  errors={errors}
-                  name="new_password"
-                  render={({ message }) => (
-                    <small className="text-red-600 italic mb-5">
-                      {message}
-                    </small>
-                  )}
-                />
-              </div>
+              <p className="text-xs font-light mt-2 text-justify">
+                <b className="font-medium">Notice:</b> You will not be able to
+                change your student ID after it is mapped, make sure you have
+                entered the right value!
+              </p>
             </div>
           </CardBody>
           <CardFooter className="pt-0 mt-2">
@@ -145,4 +120,4 @@ function ChangePasswordDialog({ open, handleOpen }) {
   );
 }
 
-export default ChangePasswordDialog;
+export default MapStudentIdDialog;
