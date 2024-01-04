@@ -14,13 +14,16 @@ import { PiSignOutBold } from "react-icons/pi";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
+import { ClassContext } from "../../context/ClassContext";
 
 function AccountMenu() {
   const { user, logout } = useContext(AuthContext);
+  const { setClassList } = useContext(ClassContext);
   const navigate = useNavigate();
 
   function handleSignout() {
     axios.delete("/users/logout");
+    setClassList(null);
     logout();
     navigate("/sign-in");
   }
