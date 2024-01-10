@@ -33,14 +33,14 @@ function AccountMenu() {
       <PopoverHandler>
         <button>
           <Avatar
-            src={user?.image?.url || "/default-user-image.png"}
+            src={user?.image || "/default-user-image.png"}
             size="sm"
           ></Avatar>
         </button>
       </PopoverHandler>
       <PopoverContent className="w-72">
         <div className="mb-4 flex items-center gap-4 border-b border-blue-gray-50 pb-4">
-          <Avatar src={user?.image?.url || "/default-user-image.png"} />
+          <Avatar src={user?.image || "/default-user-image.png"} />
           <div>
             <Typography variant="h6" color="blue-gray">
               {user?.full_name || "Full name"}

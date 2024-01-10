@@ -9,14 +9,15 @@ import { FaCheck } from "react-icons/fa";
 import { ErrorMessage } from "@hookform/error-message";
 import { toast } from "react-toastify";
 import MapStudentIdDialog from "./MapStudentIdDialog";
+import axios from "axios";
 
 function AccountPage() {
   const [changingPassword, setChangingPassword] = useState(false);
   const [editing, setEditing] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [savingImage, setSavingImage] = useState(false);
   const [mappingID, setMappingID] = useState(false);
   const { user, setUser } = useContext(AuthContext);
-  const imageRef = useRef(null);
   const {
     register,
     reset,
@@ -29,40 +30,73 @@ function AccountPage() {
 
   function handleEdit() {
     setEditing(true);
-    reset(user);
+    reset({ phone_number: user.phone_number || "" });
   }
 
   function handleCancelEditProfile() {
     setEditing(false);
     reset({
       full_name: user.full_name,
-      phone: user.phone || " ",
-      student_id: user.student_id || " ",
+      phone_number: user.phone_number || " ",
     });
   }
 
   function handleSaveProfile(data) {
     setSavingProfile(true);
-    setTimeout(() => {
-      setSavingProfile(false);
-      // setUser();
-      handleCancelEditProfile();
-      toast.success("User information saved");
-    }, 2000);
+    axios
+      .patch("/users/profile", {
+        ...user,
+        full_name: data.full_name,
+        phone_number: data.phone_number == " " ? null : data.phone_number,
+      })
+      .then((res) => {
+        setUser(res.data.data);
+        setEditing(false);
+        toast.success("Updated profile");
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Something went wrong, please try again!");
+      })
+      .finally(() => {
+        setSavingProfile(false);
+      });
   }
 
   function handleChangeImage(event) {
     if (event.target.files.length <= 0) return;
     const image = event.target.files[0];
-    // const data = new FormData();
-    // data.append("file", image, image.name);
-
-    setUser({
-      ...user,
-      image: {
-        url: URL.createObjectURL(image),
-      },
-    });
+    const data = new FormData();
+    data.append("file", image, image.name);
+    const message = toast.loading("Uploading");
+    setSavingImage(true);
+    axios
+      .patch("/users/avatar", data, {
+        headers: {
+          accept: "application/json",
+          "Content-Type": `multipart/form-data; boundary=${data._boundary}`,
+        },
+      })
+      .then((res) => {
+        toast.update(message, {
+          render: "Updated avatar",
+          isLoading: false,
+          type: "success",
+          autoClose: true,
+        });
+        setUser(res.data.data);
+      })
+      .catch((error) => {
+        toast.update(message, {
+          render: "Error happened when uploading new avatar, please try again!",
+          isLoading: false,
+          type: "error",
+          autoClose: true,
+        });
+      })
+      .finally(() => {
+        setSavingImage(false);
+      });
   }
 
   function handleChangePassword() {
@@ -73,14 +107,13 @@ function AccountPage() {
     if (user == null) return;
     reset({
       full_name: user.full_name,
-      phone: user.phone || " ",
-      student_id: user.student_id || " ",
+      phone_number: user.phone_number || " ",
     });
   }, [user]);
 
   return (
     <>
-      <div className="bg-indigo-50 pb-8">
+      <div className="bg-indigo-50 pb-8 min-h-full">
         <div className="h-[300px] w-full cover-image px-6 flex justify-center">
           <div className="h-full w-full xl:w-[900px]">
             <h1 className="text-3xl text-gray-50 font-semibold pt-20">
@@ -93,7 +126,7 @@ function AccountPage() {
             <div className="w-40 h-40 relative group">
               <img
                 className="w-full aspect-square rounded-full object-cover bg-indigo-500"
-                src={user?.image?.url || "/default-user-image.png"}
+                src={user?.image || "/default-user-image.png"}
               ></img>
               <div className="absolute top-0 left-0 w-40 h-40 flex items-center justify-center">
                 <label className="opacity-20 group-hover:opacity-50 bg-gray-300 hover:bg-gray-200 py-1 px-2 rounded-md">
@@ -104,6 +137,7 @@ function AccountPage() {
                     type="file"
                     onChange={handleChangeImage}
                     className="hidden"
+                    disabled={savingImage || savingProfile}
                   ></input>
                 </label>
               </div>
@@ -139,7 +173,7 @@ function AccountPage() {
                           <button
                             className="flex items-center gap-1 fill-green-200 hover:fill-green-500"
                             type="submit"
-                            disabled={savingProfile}
+                            disabled={savingProfile || savingImage}
                           >
                             <FaCheck size="0.9rem" fill="inherit" />
                           </button>
@@ -153,7 +187,7 @@ function AccountPage() {
                             type="button"
                             onClick={handleCancelEditProfile}
                             className="flex items-center gap-1 fill-red-200 hover:fill-red-500"
-                            disabled={savingProfile}
+                            disabled={savingProfile || savingImage}
                           >
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -193,7 +227,7 @@ function AccountPage() {
                     </div>
                     <div>
                       <Input
-                        {...register("phone", {
+                        {...register("phone_number", {
                           pattern: {
                             value: /^[0-9]{9}/,
                             message: "Invalid phone number",
@@ -206,7 +240,7 @@ function AccountPage() {
                       ></Input>
                       <ErrorMessage
                         errors={errors}
-                        name="phone"
+                        name="phone_number"
                         render={({ message }) => (
                           <small className="text-red-600 italic mb-5">
                             {message}
@@ -235,6 +269,7 @@ function AccountPage() {
                             }}
                           />
                           <button
+                            type="button"
                             onClick={() => setMappingID(true)}
                             className="!absolute right-1 top-5 flex items-center gap-1 text-blue-gray-300 hover:text-blue-gray-500 fill-blue-gray-300 font-semibold hover:fill-blue-gray-500"
                           >

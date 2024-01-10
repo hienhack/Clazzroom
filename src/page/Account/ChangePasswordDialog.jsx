@@ -17,19 +17,30 @@ import { AuthContext } from "../../context/AuthContext";
 
 function ChangePasswordDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState(false);
   const { user, setUser } = useContext(AuthContext);
 
   function onSubmit(data) {
     setProcessing(true);
-    setTimeout(() => {
-      setProcessing(false);
-      toast.success("Saved student ID");
-    }, 2000);
+    axios
+      .patch("/users/change-pw", data)
+      .then((res) => {
+        toast.success("Updated password");
+        handleCancel();
+      })
+      .catch((error) => {
+        if (error.reponse.data.statusCode == 403) {
+          setMessage("Incorrect password!");
+        } else {
+          toast.error("Something went wrong, please try again!");
+        }
+      });
   }
 
   function handleCancel() {
     reset();
     handleOpen();
+    setError(null);
   }
 
   const {
@@ -39,7 +50,8 @@ function ChangePasswordDialog({ open, handleOpen }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      class_code: "",
+      password: "",
+      newPassword: "",
     },
     mode: "onSubmit",
     reValidateMode: "onBlur",
@@ -60,9 +72,12 @@ function ChangePasswordDialog({ open, handleOpen }) {
               Change password
             </Typography>
             <div className="flex flex-col gap-6">
+              {error && (
+                <h6 className="text-red-600 text-sm italic mb-5">{error}</h6>
+              )}
               <div>
                 <Input
-                  {...register("current_password", {
+                  {...register("password", {
                     required: {
                       value: true,
                       message: "Current password is required ",
@@ -72,13 +87,14 @@ function ChangePasswordDialog({ open, handleOpen }) {
                       message: "Password must have at last 8 characters",
                     },
                   })}
+                  type="password"
                   className="mb-4"
                   variant="standard"
                   label="Current password"
                 ></Input>
                 <ErrorMessage
                   errors={errors}
-                  name="current_password"
+                  name="password"
                   render={({ message }) => (
                     <small className="text-red-600 italic mb-5">
                       {message}
@@ -88,7 +104,7 @@ function ChangePasswordDialog({ open, handleOpen }) {
               </div>
               <div>
                 <Input
-                  {...register("new_password", {
+                  {...register("newPassword", {
                     required: {
                       value: true,
                       message: "New password is required ",
@@ -98,13 +114,14 @@ function ChangePasswordDialog({ open, handleOpen }) {
                       message: "Password must have at last 8 characters",
                     },
                   })}
+                  type="password"
                   className="mb-4"
                   variant="standard"
                   label="New password"
                 ></Input>
                 <ErrorMessage
                   errors={errors}
-                  name="new_password"
+                  name="newPassword"
                   render={({ message }) => (
                     <small className="text-red-600 italic mb-5">
                       {message}

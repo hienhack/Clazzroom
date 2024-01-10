@@ -17,19 +17,35 @@ import { AuthContext } from "../../context/AuthContext";
 
 function MapStudentIdDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState(null);
   const { user, setUser } = useContext(AuthContext);
 
   function onSubmit(data) {
     setProcessing(true);
-    setTimeout(() => {
-      setProcessing(false);
-      toast.success("Saved student ID");
-    }, 2000);
+    axios
+      .patch("/users/profile", { ...user, student_id: data.student_id })
+      .then((res) => {
+        setUser(res.data.data);
+        toast.success("Saved student ID");
+        handleOpen();
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response.data.statusCode == 400) {
+          setError("Student ID existed");
+        } else {
+          toast.error("Something went wrong, please try again!");
+        }
+      })
+      .finally(() => {
+        setProcessing(false);
+      });
   }
 
   function handleCancel() {
     reset();
     handleOpen();
+    setError(null);
   }
 
   const {
@@ -39,7 +55,7 @@ function MapStudentIdDialog({ open, handleOpen }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      class_code: "",
+      student_id: "",
     },
     mode: "onSubmit",
     reValidateMode: "onBlur",
@@ -60,6 +76,9 @@ function MapStudentIdDialog({ open, handleOpen }) {
               Map student ID
             </Typography>
             <div className="flex flex-col gap-6">
+              {error && (
+                <h6 className="text-red-600 text-sm italic mb-5">{error}</h6>
+              )}
               <div>
                 <Input
                   {...register("student_id", {
