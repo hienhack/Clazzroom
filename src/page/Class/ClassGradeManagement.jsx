@@ -10,15 +10,22 @@ import {
   Tooltip,
   Typography,
 } from "@material-tailwind/react";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { set, useFieldArray, useForm, useWatch } from "react-hook-form";
 import { FaRegEdit } from "react-icons/fa";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { MdOutlineUploadFile, MdDownload, MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
 import PopoverMenu from "../../component/common/PopoverMenu";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { ClassContext } from "../../context/ClassContext";
 import { ErrorMessage } from "@hookform/error-message";
 import InputFileButton from "../../component/common/InputFileButton";
@@ -26,94 +33,14 @@ import axios from "axios";
 import { readXlsx, createXlsx } from "../../utils/XLSXHelper";
 import { saveAs } from "file-saver";
 
-const testAccount = [
-  {
-    _id: "1",
-    full_name: "A Nguyen",
-    email: "hahaha@gmail.com",
-    student_id: "20120001",
-    image: "",
-  },
-  {
-    _id: "2",
-    full_name: "Hien Thai",
-    email: "hienthai@gmail.com",
-    student_id: "20120002",
-    image: "",
-  },
-  {
-    _id: "4",
-    full_name: "Khanh Le",
-    email: "nguyenkhan@gmail.com",
-    student_id: "20120004",
-    image:
-      "https://afamilycdn.com/150157425591193600/2023/7/10/3581026861353491429191131976811112986346003n-168896101713887268472.jpg",
-  },
-];
-
-const testStudentList = [
-  {
-    _id: "1fdd",
-    student_id: "20120011",
-    grades: [
-      { _id: 1, name: "Addtition", value: null },
-      { _id: 3, name: "Assigment 2", value: 8 },
-      { _id: 5, name: "Midterm", value: 7 },
-      { _id: 6, name: "Final", value: 8 },
-    ],
-    full_name: "Nguyen Van A",
-  },
-  {
-    _id: "2",
-    student_id: "20120002",
-    grades: [
-      { _id: 1, name: "Addtition", value: 10 },
-      { _id: 3, name: "Assigment 2", value: 10 },
-      { _id: 5, name: "Midterm", value: 8.5 },
-      { _id: 6, name: "Final", value: 10 },
-    ],
-    full_name: "Thai Ngoc Vinh Hien",
-  },
-  {
-    _id: "3",
-    student_id: "20120003",
-    grades: [
-      { _id: 1, name: "Addtition", value: 9 },
-      { _id: 3, name: "Assigment 2", value: 9 },
-      { _id: 5, name: "Midterm", value: 6.5 },
-      { _id: 6, name: "Final", value: 8 },
-    ],
-    full_name: "Tran Van B",
-  },
-  {
-    _id: "4",
-    student_id: "20120004",
-    grades: [
-      { _id: 1, name: "Addtition", value: -1 },
-      { _id: 3, name: "Assigment 2", value: 7 },
-      { _id: 5, name: "Midterm", value: 6 },
-      { _id: 6, name: "Final", value: 9.5 },
-    ],
-    full_name: "Le Thi Kieu Khanh",
-  },
-  {
-    _id: "5",
-    student_id: "20120005",
-    grades: [
-      { _id: 1, name: "Addtition", value: 5 },
-      { _id: 3, name: "Assigment 2", value: 10 },
-      { _id: 5, name: "Midterm", value: 6 },
-      { _id: 6, name: "Final", value: 10 },
-    ],
-    full_name: "No Name Man",
-  },
-];
-
 function getTotal(compositions, grades) {
   let result = 0;
-  compositions.forEach((c, index) => {
-    if (!isNaN(grades[index].value)) {
-      result = result + (c.scale / 100) * grades[index].value;
+  compositions.forEach((c) => {
+    const found = grades.find((g) => g.grade_composition_id == c._id);
+    if (found) {
+      if (!isNaN(found.value)) {
+        result = result + (c.scale / 100) * found.value;
+      }
     }
   });
 
@@ -122,6 +49,7 @@ function getTotal(compositions, grades) {
 
 function Total({ control, compositions }) {
   const grades = useWatch({ control: control, name: "grades" });
+  console.log(grades);
   const total = getTotal(compositions, grades);
   return <h6 className="text-center">{isNaN(total) ? "" : total}</h6>;
 }
@@ -133,6 +61,7 @@ function EditStudent({
   handleSuccess,
   handleCancel,
 }) {
+  const { classId } = useParams();
   const [saving, setSaving] = useState(false);
   const {
     register,
@@ -144,7 +73,7 @@ function EditStudent({
     defaultValues: {
       student_id: student.student_id,
       full_name: student.full_name,
-      grades: student.grades.map((g) => ({ value: g.value })),
+      grades: student.grades,
     },
   });
   const { fields, remove } = useFieldArray({
@@ -155,23 +84,39 @@ function EditStudent({
   function handleSave() {
     setSaving(true);
     if (isValid) {
+      const message = toast.loading("Saving");
       const data = getValues();
-      student.student_id = data.student_id;
-      student.full_name = data.full_name;
-      student.grades.forEach((g, index) => {
-        if (isNaN(data.grades[index].value)) {
+      data.grades.forEach((g) => {
+        if (isNaN(g.value)) {
           g.value = null;
-        } else {
-          g.value = data.grades[index].value;
         }
       });
 
-      // Call api here
-      // Error: toast.error(error.response.data.message);
-      setTimeout(() => {
-        setSaving(false);
-        handleSuccess(index, student);
-      }, 2000);
+      axios
+        .put(`/classes/${classId}/student-list/${student._id}`, data)
+        .then((res) => {
+          handleSuccess(index, res.data.data);
+          toast.update(message, {
+            type: "success",
+            render: "Saved successfully",
+            isLoading: false,
+            autoClose: true,
+          });
+          setSaving(false);
+        })
+        .catch((error) => {
+          if (error.reponse.data.statusCode == 400) {
+            toast.update(message, {
+              type: "error",
+              render: error.response.data.message,
+              isLoading: false,
+              autoClose: true,
+            });
+          } else {
+            alert("Something went wrong, please try again");
+          }
+        })
+        .finally(() => setSaving(false));
     } else {
       setSaving(false);
       for (let field in errors) {
@@ -206,11 +151,7 @@ function EditStudent({
         {student.account && (
           <div className="flex items-center gap-2">
             <img
-              src={
-                student.account.image != ""
-                  ? student.account.image
-                  : "/default-user-image.png"
-              }
+              src={student.account.image || "/default-user-image.png"}
               className="w-8 h-8 rounded-full object-cover object-center"
             />
 
@@ -280,8 +221,422 @@ function EditStudent({
   );
 }
 
-function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
+function ClassGradeManagement() {
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
+  const { classId } = useParams();
+  const messageRef = useRef();
+  const {
+    mappedAccount,
+    setMappedAccount,
+    studentList,
+    setStudentList,
+    gradeCompositions,
+    setGradeCompositions,
+  } = useOutletContext();
+  const [uploadGrade, setUploadgrade] = useState(false);
+  const inputFileRef = useRef(null);
+  // const message = useRef(null);
+  const [editing, setEditing] = useState(
+    studentList && Array(studentList.length).fill(false)
+  );
+
+  useMemo(() => {
+    if (studentList == null || mappedAccount == null) {
+      return;
+    }
+    studentList.map((s) => {
+      s.account = mappedAccount.find((a) => a.student_id == s.student_id);
+      return s;
+    });
+  }, [studentList, mappedAccount]);
+
+  function onEditBtnClick(index) {
+    const newEditing = editing.slice();
+    newEditing[index] = true;
+    setEditing(newEditing);
+  }
+
+  function handleSuccess(index, updated) {
+    const newEditing = editing.slice();
+    newEditing[index] = false;
+    setEditing(newEditing);
+
+    const newStudentList = studentList.slice();
+    newStudentList[index] = updated;
+    setStudentList(newStudentList);
+    loadMappedAccount();
+  }
+
+  function handleCancel(index) {
+    const newEditing = editing.slice();
+    newEditing[index] = false;
+    setEditing(newEditing);
+  }
+
+  function setCompositionState(index, state) {
+    const newGradeCompositions = gradeCompositions.slice();
+    newGradeCompositions[index].state = state;
+    setGradeCompositions(newGradeCompositions);
+  }
+
+  function downloadGradeTemplate() {
+    const data = [["Student id", "Grade"]];
+    const newStudentList = studentList.slice();
+    newStudentList.sort((a, b) => (a.student_id < b.student_id ? -1 : 1));
+    newStudentList.forEach((s) => {
+      data.push([s.student_id]);
+    });
+    const file = createXlsx(data);
+    saveAs(file, "Grade template.xlsx");
+  }
+
+  function downloadGradeBoard() {
+    const data = [
+      [
+        "Student ID",
+        "Full name",
+        "Account",
+        ...gradeCompositions.map((c) => `${c.name} (${c.scale}%)`),
+      ],
+    ];
+    studentList.forEach((s) => {
+      data.push([
+        s.student_id,
+        s.full_name,
+        s.account?.full_name,
+        ...s.grades.map((g) => g.value),
+      ]);
+    });
+    const file = createXlsx(data);
+    saveAs(file, "Grade board.xlsx");
+  }
+
+  function downloadStudentList() {
+    const data = [["Student ID", "Full name"]];
+    studentList.forEach((s) => {
+      data.push([s.student_id, s.full_name]);
+    });
+    const file = createXlsx(data);
+    saveAs(file, "Student list.xlsx");
+  }
+
+  function handleUploadStudentList(e) {
+    if (e.target.files == null) return;
+    messageRef.current = toast.loading("Uploading");
+    const resolver = function (loaded) {
+      let data = [];
+      try {
+        data = loaded.map((r) => {
+          if (r.length != 2 || !r[0] || !r[1])
+            throw new Error("Invalid file format");
+          return { student_id: r[0], full_name: r[1] };
+        });
+      } catch (error) {
+        toast.update(messageRef.current, {
+          type: "error",
+          render: error.message,
+          isLoading: false,
+          autoClose: true,
+        });
+        return;
+      }
+
+      data.shift();
+      axios
+        .post(`/classes/${classId}/student-list`, data)
+        .then((res) => {
+          loadStudentList();
+          loadMappedAccount();
+          toast.update(messageRef.current, {
+            render: "Uploaded successfully",
+            isLoading: false,
+            type: "success",
+            autoClose: "true",
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          toast.update(messageRef.current, {
+            render: error.reponse.data.message,
+            isLoading: false,
+            type: "error",
+            autoClose: "true",
+          });
+        });
+    };
+    const onFinish = (e) => {
+      console.log("Finished");
+    };
+    const onError = (e) => {
+      toast.update(messageRef.current, {
+        render: e.message,
+        isLoading: false,
+        type: "error",
+        autoClose: true,
+      });
+    };
+
+    readXlsx(e.target.files[0], resolver, onFinish, onError);
+  }
+
+  function setFinalized(index, id) {
+    if (gradeCompositions[index].state === "Finalized") return;
+    axios
+      .patch(`/classes/${classId}/grade-compositions/${id}/finalized`)
+      .then(() => {
+        setCompositionState(index, "Finalized");
+        toast.success(gradeCompositions[index].name + " state updated");
+      })
+      .catch((error) => alert("Something went wrong, please reload the page!"));
+  }
+
+  function setInProgress(index, id) {
+    if (gradeCompositions[index].state === "In-progress") return;
+    axios
+      .put(`/classes/${classId}/grades`, [
+        { ...gradeCompositions[index], state: "In-progress" },
+      ])
+      .then((res) => {
+        toast.success(gradeCompositions[index].name + " state updated");
+        setCompositionState(index, "In-progress");
+      })
+      .catch((error) => alert("Something when wrong, please reload the page"));
+  }
+
+  const loadMappedAccount = useCallback(() => {
+    axios
+      .get(`/classes/${classId}/student-list/mapped-account`)
+      .then((res) => {
+        setMappedAccount(res.data.data);
+      })
+      .catch((error) => {});
+  }, []);
+
+  const loadStudentList = useCallback(() => {
+    axios
+      .get(`/classes/${classId}/student-list`)
+      .then((res) => {
+        setStudentList(res.data.data);
+        setEditing(new Array(res.data.data.length).fill(false));
+      })
+      .catch((error) => {});
+  });
+
+  useEffect(() => {
+    loadStudentList();
+  }, []);
+
+  useEffect(() => {
+    loadMappedAccount();
+  }, []);
+
+  return (
+    <>
+      <div className="h-full p-6 over">
+        <div className="min-h-full w-fit max-w-full bg-white mx-auto rounded-lg drop-shadow-lg flex flex-col">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h6 className="font-semibold">Grade board</h6>
+              </div>
+              <div className="flex items-center flex-row-reverse gap-2">
+                <PopoverMenu
+                  menuItems={[
+                    { title: "Grade template", onClick: downloadGradeTemplate },
+                    { title: "Grade board", onClick: downloadGradeBoard },
+                    { title: "Student list", onClick: downloadStudentList },
+                  ]}
+                >
+                  <button className="fill-blue-gray-400 hover:fill-blue-gray-700">
+                    <MdDownload size="1.4rem" className="fill-inherit" />
+                  </button>
+                </PopoverMenu>
+                <PopoverMenu
+                  menuItems={[
+                    {
+                      title: "Grades for a composition",
+                      onClick: () => {
+                        setUploadgrade(true);
+                      },
+                    },
+                    {
+                      title: "Student list",
+                      onClick: () => inputFileRef.current.click(),
+                    },
+                  ]}
+                >
+                  <button className="fill-blue-gray-400 hover:fill-blue-gray-700">
+                    <MdOutlineUploadFile
+                      size="1.4rem"
+                      className="fill-inherit"
+                    />
+                  </button>
+                </PopoverMenu>
+                <input
+                  className="hidden"
+                  onChange={(e) => handleUploadStudentList(e)}
+                  ref={inputFileRef}
+                  type="file"
+                  accept=".xlsx"
+                ></input>
+              </div>
+            </div>
+          </div>
+          <hr className="border-gray-300" />
+          <div className="max-w-ful min-h-full overflow-x-auto grow">
+            <table className="text-sm table-fixed">
+              <thead>
+                <tr className="bg-indigo-800 text-gray-50 h-[50px]">
+                  <th className="px-1 font-medium min-w-[3.5rem] text-center">
+                    #
+                  </th>
+                  <th className="px-1 font-medium min-w-[6rem] text-left">
+                    Student ID
+                  </th>
+                  <th className="px-1 font-medium min-w-[11rem] text-left">
+                    Full name
+                  </th>
+                  <th className="px-1 font-medium min-w-[11rem] text-left">
+                    Account
+                  </th>
+                  {gradeCompositions?.map((c, index) => (
+                    <th key={c._id} className="font-medium min-w-[8rem]">
+                      <div className="w-[8rem] px-2 py-2">
+                        <h6 className="truncate">{c.name}</h6>
+                        <h6 className="text-xs truncate">{c.scale}%</h6>
+                        <div className="flex items-center gap-1 w-[7.5rem] justify-center">
+                          <label className="text-[11px] font-light">
+                            State:
+                          </label>
+                          <PopoverMenu
+                            menuItems={[
+                              {
+                                title: "In-progress",
+                                onClick: () => setInProgress(index, c._id),
+                              },
+                              {
+                                title: "Finalized",
+                                onClick: () => setFinalized(index, c._id),
+                              },
+                            ]}
+                          >
+                            <button className="flex gap-2">
+                              <span className="text-xs font-normal">
+                                {c.state}
+                              </span>
+                              <div>
+                                <IoMdArrowDropup className="-m-1" />
+                                <IoMdArrowDropdown className="-m-1" />
+                              </div>
+                            </button>
+                          </PopoverMenu>
+                        </div>
+                      </div>
+                    </th>
+                  ))}
+                  <th className="px-1 font-medium min-w-[7rem]">Total</th>
+                  <th className="px-1 font-medium min-w-[7rem]">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {studentList?.map((s, index) =>
+                  !editing[index] ? (
+                    <tr
+                      key={index}
+                      className="h-[50px] border-t border-gray-300 font-light"
+                    >
+                      <td className="px-1 text-center">{index + 1}</td>
+                      <td className="px-1">{s.student_id}</td>
+                      <td className="px-1">{s.full_name}</td>
+                      <td className="px-1">
+                        {s.account && (
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={s.account.image || "/default-user-image.png"}
+                              className="w-8 h-8 rounded-full object-cover object-center"
+                            />
+
+                            <div className="flex gap-0 flex-col">
+                              <small className="text-xs font-normal">
+                                {s.account.full_name}
+                              </small>
+                              <small className="text-[0.7rem] font-light leading-3">
+                                {s.account.email}
+                              </small>
+                            </div>
+                          </div>
+                        )}
+                      </td>
+                      {s.grades.map((g) => (
+                        <td key={g._id} className="px-1 text-center">
+                          {g.value}
+                        </td>
+                      ))}
+
+                      <td className="px-1">
+                        <h6 className="text-center">
+                          {currentClass &&
+                            getTotal(gradeCompositions, s.grades)}
+                        </h6>
+                      </td>
+                      <td className="px-1">
+                        <div className="flex justify-center items-center gap-1">
+                          <Tooltip
+                            className="bg-gray-700 text-xs py-1"
+                            placement="bottom"
+                            content="Edit"
+                          >
+                            <button
+                              className="fill-blue-gray-600 hover:fill-blue-gray-900"
+                              onClick={(e) => onEditBtnClick(index)}
+                            >
+                              <FaRegEdit
+                                size="1.15rem"
+                                className="fill-inherit"
+                              />
+                            </button>
+                          </Tooltip>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    <EditStudent
+                      key={index}
+                      index={index}
+                      student={s}
+                      compositions={gradeCompositions}
+                      handleSuccess={handleSuccess}
+                      handleCancel={handleCancel}
+                    />
+                  )
+                )}
+              </tbody>
+            </table>
+            {studentList?.length == 0 && (
+              <div className="mt-16 flex flex-col items-center justify-center">
+                <img src="/empty.png" className="w-[150px]"></img>
+                <h6 className="text-center font-bold mt-8 text-blue-gray-700">
+                  Student list is empty
+                </h6>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <UploadGrades
+        open={uploadGrade}
+        handleOpen={() => setUploadgrade(false)}
+        compositions={gradeCompositions}
+        onSuccess={loadStudentList}
+      ></UploadGrades>
+    </>
+  );
+}
+
+function UploadGrades({ open, handleOpen, compositions, onSuccess }) {
   const { currentClass } = useContext(ClassContext);
+  const [processing, setProcessing] = useState(false);
   const fileRef = useRef(null);
   const message = useRef(null);
 
@@ -297,27 +652,57 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
   });
   function upload(data) {
     message.current = toast.loading("Uploading");
+    setProcessing(true);
     let grades = [];
 
     const resolver = (loaded) => {
-      // call api here
-      // Result is a new studentList => setStudentList
-      console.log(loaded);
-      console.log("");
-      setTimeout(() => {
-        toast.loading(message.current, {
-          render: "Saved",
-          isLoading: false,
-          type: "success",
-          autoClose: "true",
+      loaded.shift();
+      try {
+        grades = loaded.map((r) => {
+          if (r.length != 2 || !r[0] || !r[1] || isNaN(r[1]))
+            throw new Error("Invalid file format");
+          return { student_id: r[0], value: r[1] };
         });
-      }, 2000);
+      } catch (error) {
+        toast.update(message.current, {
+          type: "error",
+          render: error.message,
+          isLoading: false,
+          autoClose: true,
+        });
+        setProcessing(false);
+        return;
+      }
+
+      axios
+        .put(`/classes/${currentClass._id}/grades/upload`, {
+          grade_composition_id: data.composition,
+          data: grades,
+        })
+        .then((res) => {
+          toast.update(message.current, {
+            render: "Uploaded successfully",
+            isLoading: false,
+            type: "success",
+            autoClose: "true",
+          });
+          handleOpen();
+          onSuccess();
+        })
+        .catch((error) => {
+          toast.update(message.current, {
+            render: error.reponse.data.message,
+            isLoading: false,
+            type: "error",
+            autoClose: "true",
+          });
+        })
+        .finally(() => setProcessing(false));
     };
-    const onFinish = (e) => {
-      toast.update(message.current, { render: "Saving", isLoading: true });
-    };
+
+    const onFinish = () => {};
+
     const onError = (e) => {
-      console.log("Go over here");
       toast.update(message.current, {
         render: e.message,
         isLoading: false,
@@ -326,15 +711,7 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
       });
     };
 
-    readXlsx(
-      fileRef.current,
-      (loaded) => {
-        grades = loaded;
-        console.log(grades);
-      },
-      onFinish,
-      onError
-    );
+    readXlsx(fileRef.current, resolver, onFinish, onError);
   }
 
   function handleCancel() {
@@ -347,6 +724,7 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
       size="xs"
       open={open}
       handler={handleOpen}
+      dismiss={{ enabled: false }}
       className="bg-transparent shadow-none"
     >
       <form onSubmit={handleSubmit(upload)}>
@@ -363,12 +741,11 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
                   }}
                   label="Select grade composition"
                 >
-                  {currentClass &&
-                    currentClass.grade_compositions.map((c) => (
-                      <Option key={c._id} value={c._id}>
-                        {c.name}
-                      </Option>
-                    ))}
+                  {compositions?.map((c) => (
+                    <Option key={c._id} value={c._id}>
+                      {c.name}
+                    </Option>
+                  ))}
                 </Select>
                 <input
                   {...register("composition", {
@@ -439,6 +816,7 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
                 color="red"
                 onClick={handleCancel}
                 className="normal-case rounded-md"
+                disabled={processing}
               >
                 <span>Cancel</span>
               </Button>
@@ -448,6 +826,7 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
                 size="sm"
                 variant="gradient"
                 color="blue"
+                disabled={processing}
               >
                 Upload
               </Button>
@@ -456,273 +835,6 @@ function UploadGrades({ open, handleOpen, uploadHandler, studentList }) {
         </Card>
       </form>
     </Dialog>
-  );
-}
-
-function ClassGradeManagement() {
-  const { currentClass, setCurrentClass } = useContext(ClassContext);
-  const { mappedAccount, setMappedAccount, studentList, setStudentList } =
-    useOutletContext();
-  const [uploadGrade, setUploadgrade] = useState(false);
-  const [displayComposition, setDisplayComposition] = useState(
-    currentClass && Array(currentClass.grade_compositions.length).fill(true)
-  );
-  const [editing, setEditing] = useState(
-    studentList && Array(studentList.length).fill(false)
-  );
-
-  useMemo(() => {
-    if (studentList == null || mappedAccount == null) {
-      return;
-    }
-    studentList.map((s) => {
-      s.account = mappedAccount.find((a) => a.student_id == s.student_id);
-      return s;
-    });
-  }, [studentList]);
-
-  function onEditBtnClick(index) {
-    const newEditing = editing.slice();
-    newEditing[index] = true;
-    setEditing(newEditing);
-  }
-
-  function handleSuccess(index, updated) {
-    toast.success(`Student #${index + 1} saved successfully`);
-
-    const newEditing = editing.slice();
-    newEditing[index] = false;
-    setEditing(newEditing);
-
-    const newStudentList = studentList.slice();
-    newStudentList[index] = updated;
-    setStudentList(newStudentList);
-  }
-
-  function handleCancel(index) {
-    const newEditing = editing.slice();
-    newEditing[index] = false;
-    setEditing(newEditing);
-  }
-
-  function setCompositionState(index, state) {
-    if (currentClass.grade_compositions[index].state === state) return;
-    const { ...newClass } = currentClass;
-    newClass.grade_compositions[index].state = state;
-    setCurrentClass(newClass);
-  }
-
-  function downloadGradeTemplate() {
-    const data = [["Student id", "Grade"]];
-    const newStudentList = studentList.slice();
-    newStudentList.sort((a, b) => (a.student_id < b.student_id ? -1 : 1));
-    newStudentList.forEach((s) => {
-      data.push([s.student_id]);
-    });
-    const file = createXlsx(data);
-    saveAs(file, "Grade template.xlsx");
-  }
-
-  useEffect(() => {
-    if (studentList == null) {
-      // For testing only
-      setStudentList(testStudentList);
-      setEditing(new Array(testStudentList.length).fill(false));
-    }
-
-    if (mappedAccount == null) {
-      // Fortesting only
-      setMappedAccount(testAccount);
-    }
-  }, []);
-
-  return (
-    <>
-      <div className="min-h-full p-6">
-        <div className="h-full w-fit max-w-full bg-white mx-auto rounded-lg drop-shadow-md">
-          <div className="px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h6 className="font-semibold">Grade board</h6>
-              </div>
-              <div className="flex items-center flex-row-reverse gap-2">
-                <PopoverMenu
-                  menuItems={[
-                    { title: "Grade template", onClick: downloadGradeTemplate },
-                    { title: "Grade board", onClick: () => {} },
-                    { title: "Student list", onClick: () => {} },
-                  ]}
-                >
-                  <button className="fill-blue-gray-400 hover:fill-blue-gray-700">
-                    <MdDownload size="1.4rem" className="fill-inherit" />
-                  </button>
-                </PopoverMenu>
-                <PopoverMenu
-                  menuItems={[
-                    {
-                      title: "Grades for a composition",
-                      onClick: () => {
-                        setUploadgrade(true);
-                      },
-                    },
-                    { title: "Student list", onClick: () => {} },
-                  ]}
-                >
-                  <button className="fill-blue-gray-400 hover:fill-blue-gray-700">
-                    <MdOutlineUploadFile
-                      size="1.4rem"
-                      className="fill-inherit"
-                    />
-                  </button>
-                </PopoverMenu>
-              </div>
-            </div>
-          </div>
-          <hr className="border-gray-300" />
-          <div className="max-w-full overflow-x-auto">
-            <table className="text-sm table-fixed">
-              <thead>
-                <tr className="bg-indigo-800 text-gray-50">
-                  <th className="px-1 font-medium min-w-[3.5rem] text-center">
-                    #
-                  </th>
-                  <th className="px-1 font-medium min-w-[6rem] text-left">
-                    Student ID
-                  </th>
-                  <th className="px-1 font-medium min-w-[11rem] text-left">
-                    Full name
-                  </th>
-                  <th className="px-1 font-medium min-w-[11rem] text-left">
-                    Account
-                  </th>
-                  {currentClass?.grade_compositions.map((c, index) => (
-                    <th key={c._id} className="font-medium min-w-[8rem]">
-                      <div className="w-[8rem] px-2 py-2">
-                        <h6 className="truncate">{c.name}</h6>
-                        <h6 className="text-xs truncate">{c.scale}%</h6>
-                        <div className="flex items-center gap-1 w-[7.5rem] justify-center">
-                          <label className="text-[11px] font-light">
-                            State:
-                          </label>
-                          <PopoverMenu
-                            menuItems={[
-                              {
-                                title: "In-progress",
-                                onClick: () =>
-                                  setCompositionState(index, "In-progress"),
-                              },
-                              {
-                                title: "Finalized",
-                                onClick: () =>
-                                  setCompositionState(index, "Finalized"),
-                              },
-                            ]}
-                          >
-                            <button className="flex gap-2">
-                              <span className="text-xs font-normal">
-                                {c.state}
-                              </span>
-                              <div>
-                                <IoMdArrowDropup className="-m-1" />
-                                <IoMdArrowDropdown className="-m-1" />
-                              </div>
-                            </button>
-                          </PopoverMenu>
-                        </div>
-                      </div>
-                    </th>
-                  ))}
-                  <th className="px-1 font-medium min-w-[7rem]">Total</th>
-                  <th className="px-1 font-medium min-w-[7rem]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentList?.map((s, index) =>
-                  !editing[index] ? (
-                    <tr
-                      key={index}
-                      className="h-[50px] border-t border-gray-300 font-light"
-                    >
-                      <td className="px-1 text-center">{index + 1}</td>
-                      <td className="px-1">{s.student_id}</td>
-                      <td className="px-1">{s.full_name}</td>
-                      <td className="px-1">
-                        {s.account && (
-                          <div className="flex items-center gap-2">
-                            <img
-                              src={
-                                s.account.image != ""
-                                  ? s.account.image
-                                  : "/default-user-image.png"
-                              }
-                              className="w-8 h-8 rounded-full object-cover object-center"
-                            />
-
-                            <div className="flex gap-0 flex-col">
-                              <small className="text-xs font-normal">
-                                {s.account.full_name}
-                              </small>
-                              <small className="text-[0.7rem] font-light leading-3">
-                                {s.account.email}
-                              </small>
-                            </div>
-                          </div>
-                        )}
-                      </td>
-                      {s.grades.map((g) => (
-                        <td key={g._id} className="px-1 text-center">
-                          {g.value}
-                        </td>
-                      ))}
-
-                      <td className="px-1">
-                        <h6 className="text-center">
-                          {currentClass &&
-                            getTotal(currentClass.grade_compositions, s.grades)}
-                        </h6>
-                      </td>
-                      <td className="px-1">
-                        <div className="flex justify-center items-center gap-1">
-                          <Tooltip
-                            className="bg-gray-700 text-xs py-1"
-                            placement="bottom"
-                            content="Edit"
-                          >
-                            <button
-                              className="fill-blue-gray-600 hover:fill-blue-gray-900"
-                              onClick={(e) => onEditBtnClick(index)}
-                            >
-                              <FaRegEdit
-                                size="1.15rem"
-                                className="fill-inherit"
-                              />
-                            </button>
-                          </Tooltip>
-                        </div>
-                      </td>
-                    </tr>
-                  ) : (
-                    <EditStudent
-                      key={index}
-                      index={index}
-                      student={s}
-                      compositions={currentClass.grade_compositions}
-                      handleSuccess={handleSuccess}
-                      handleCancel={handleCancel}
-                    />
-                  )
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <UploadGrades
-        open={uploadGrade}
-        handleOpen={() => setUploadgrade(false)}
-      ></UploadGrades>
-    </>
   );
 }
 

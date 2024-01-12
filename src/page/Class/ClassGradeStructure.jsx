@@ -79,7 +79,6 @@ function ClassGradeStructure() {
         setEditing(false);
         const data = getValues().composition;
         data.forEach((g, index) => (g.order = index));
-        console.log(deleteItems.current);
         axios
           .post(`/classes/${classId}/grades/delete`, deleteItems.current)
           .then((res) => {
