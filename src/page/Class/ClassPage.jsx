@@ -5,18 +5,12 @@ import { ClassContext } from "../../context/ClassContext";
 import { AuthContext } from "../../context/AuthContext";
 import axios from "axios";
 
-const testComposition = [
-  { _id: "1", state: "In-progress", name: "Addtition", scale: 10 },
-  { _id: "3", state: "Finalized", name: "Assignment 2", scale: 10 },
-  { _id: "5", state: "In-progress", name: "Midterm", scale: 30 },
-  { _id: "6", state: "In-progress", name: "Final", scale: 50 },
-];
-
 function ClassPage() {
   const [controller, setController] = useState();
   const [loading, setLoading] = useState(true);
   const { setCurrentClass } = useContext(ClassContext);
   const { user } = useContext(AuthContext);
+  const [gradeCompositions, setGradeCompositions] = useState(null);
   const [studentList, setStudentList] = useState(null);
   const [mappedAccount, setMappedAccount] = useState(null);
   const { classId } = useParams();
@@ -67,18 +61,29 @@ function ClassPage() {
     axios
       .get("/classes/" + classId, {})
       .then((res) => {
-        const clazz = res.data.data;
-        if (clazz == null) return;
-        clazz.grade_compositions = testComposition;
-        setCurrentClass(clazz);
-        setLoading(false);
+        setCurrentClass(res.data.data);
       })
       .catch((error) => {
         navigate("/errors/not-found", { replace: true });
+      })
+      .finally(() => {
+        setLoading(false);
       });
+
+    axios
+      .get(`classes/${classId}/grades`)
+      .then((res) => {
+        setGradeCompositions(res.data.data);
+      })
+      .catch((error) => {
+        setGradeCompositions([]);
+        toast.error("Something went wrong, please try again later!");
+      });
+
     return () => {
       setCurrentClass(null);
       setStudentList(null);
+      setGradeCompositions(null);
       setMappedAccount(null);
     };
   }, [classId]);
@@ -98,6 +103,8 @@ function ClassPage() {
               setStudentList,
               mappedAccount,
               setMappedAccount,
+              gradeCompositions,
+              setGradeCompositions,
             }}
           />
         </div>

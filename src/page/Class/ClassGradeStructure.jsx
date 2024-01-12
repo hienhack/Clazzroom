@@ -1,7 +1,7 @@
 import { Button, Tooltip } from "@material-tailwind/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaRegEdit } from "react-icons/fa";
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext, useParams } from "react-router-dom";
 import { RiDraggable } from "react-icons/ri";
 import { FaRegTrashCan } from "react-icons/fa6";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -9,12 +9,8 @@ import { AiOutlinePlus } from "react-icons/ai";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
-
-const testList = [
-  { name: "Assignments", scale: 10 },
-  { name: "Midtern", scale: 20 },
-  { name: "Project", scale: 30 },
-];
+import axios from "axios";
+import Loading from "../../component/common/Loading";
 
 function getMessage(messageObj) {
   let result = "";
@@ -25,8 +21,12 @@ function getMessage(messageObj) {
 }
 
 function ClassGradeStructure() {
-  const { setController } = useOutletContext();
+  const { setController, gradeCompositions, setGradeCompositions } =
+    useOutletContext();
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const deleteItems = useRef([]);
+  const { classId } = useParams();
   const draggedItem = useRef();
   const {
     register,
@@ -38,7 +38,7 @@ function ClassGradeStructure() {
   } = useForm({
     mode: "onBlur",
     defaultValues: {
-      composition: testList.slice(),
+      composition: gradeCompositions,
     },
   });
   const { fields, append, remove, move } = useFieldArray({
@@ -58,13 +58,18 @@ function ClassGradeStructure() {
   function onDragOver(event, index) {
     event.preventDefault();
     if (draggedItem.current == index) return;
-
     move(draggedItem.current, index);
     draggedItem.current = index;
   }
 
   function handleAdd() {
-    append({ name: "", scale: 0 });
+    append({ _id: null, name: "", scale: 0 });
+  }
+
+  function handleRemove(index) {
+    const { _id } = getValues(`composition.${index}`);
+    remove(index);
+    if (_id != null) deleteItems.current.push({ grade_composition_id: _id });
   }
 
   const handleSave = useCallback(
@@ -72,21 +77,43 @@ function ClassGradeStructure() {
       trigger(null, { shouldFocus: true });
       if (isValid) {
         setEditing(false);
-        setTimeout(() => {
-          onSuccess();
-          toast.success("Saved");
-        }, 3000);
+        const data = getValues().composition;
+        data.forEach((g, index) => (g.order = index));
+        console.log(deleteItems.current);
+        axios
+          .post(`/classes/${classId}/grades/delete`, deleteItems.current)
+          .then((res) => {
+            deleteItems.current = [];
+            axios
+              .put(`/classes/${classId}/grades`, data)
+              .then((res) => {
+                setGradeCompositions(res.data.data);
+                reset({ composition: res.data.data });
+                onSuccess();
+                toast.success("Saved successfully");
+              })
+              .catch(() => {
+                toast.error("Something went wrong, please try again!");
+                onFailed();
+                setEditing(true);
+              });
+          })
+          .catch(() => {
+            toast.error("Something went wrong, please try again!");
+            setEditing(true);
+            onFailed();
+          });
       } else {
         onFailed();
       }
     },
-    [isValid, getValues]
+    [isValid]
   );
 
   const handleCancel = useCallback(() => {
     setEditing(false);
-    reset({ composition: testList.slice() });
-  }, []);
+    reset({ composition: gradeCompositions });
+  }, [gradeCompositions]);
 
   useEffect(() => {
     setController(
@@ -97,107 +124,123 @@ function ClassGradeStructure() {
       />
     );
     return () => setController(null);
-  }, [handleSave]);
+  }, [handleSave, handleCancel]);
+
+  useEffect(() => {
+    if (gradeCompositions == null) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+      reset({ composition: gradeCompositions });
+    }
+  }, [gradeCompositions]);
 
   return (
     <div className="p-6 h-full overflow-y-auto">
-      <div className="w-[600px] min-h-full bg-white mx-auto drop-shadow-md rounded-lg">
-        <div className="grid grid-cols-10 bg-indigo-800 text-white rounded-t-lg font-medium">
-          <div className="py-4">
-            <h6 className="text-sm text-center leading-6">#</h6>
+      {loading && <Loading></Loading>}
+      {!loading && (
+        <div className="w-[600px] min-h-full bg-white mx-auto drop-shadow-md rounded-lg">
+          <div className="grid grid-cols-10 bg-indigo-800 text-white rounded-t-lg font-medium">
+            <div className="py-4">
+              <h6 className="text-sm text-center leading-6">#</h6>
+            </div>
+            <div className="col-span-6 py-4">
+              <span className="text-sm">Composition name</span>
+            </div>
+            <div className="col-span-2 py-4">
+              <span className="text-sm">Scale</span>
+            </div>
           </div>
-          <div className="col-span-6 py-4">
-            <span className="text-sm">Composition name</span>
-          </div>
-          <div className="col-span-2 py-4">
-            <span className="text-sm">Scale</span>
-          </div>
-        </div>
-        <hr className="border-gray-300" />
-        <form>
-          <div className="flex flex-col">
-            {fields.map((c, index) => (
-              <div key={index} onDragOver={(e) => onDragOver(e, index)}>
-                <div className="grid grid-cols-10">
-                  <div className="flex items-center h-16">
-                    {editing && (
-                      <div
-                        className="w-7 h-full -mr-7 z-10 flex items-center justify-center hover:cursor-move"
-                        onDragStart={(e) => onDragStart(e, index)}
-                        draggable
-                      >
-                        <RiDraggable
-                          size="1.2rem"
-                          className="fill-blue-gray-600"
-                        />
-                      </div>
-                    )}
-                    <h6 className="text-center w-full text-sm font-medium">
-                      {index + 1}
-                    </h6>
+          <hr className="border-gray-300" />
+          <form>
+            <div className="flex flex-col">
+              {fields.map((c, index) => (
+                <div key={index} onDragOver={(e) => onDragOver(e, index)}>
+                  <div className="grid grid-cols-10">
+                    <div className="flex items-center h-16">
+                      {editing && (
+                        <div
+                          className="w-7 h-full -mr-7 z-10 flex items-center justify-center hover:cursor-move"
+                          onDragStart={(e) => onDragStart(e, index)}
+                          draggable
+                        >
+                          <RiDraggable
+                            size="1.2rem"
+                            className="fill-blue-gray-600"
+                          />
+                        </div>
+                      )}
+                      <h6 className="text-center w-full text-sm font-medium">
+                        {index + 1}
+                      </h6>
+                    </div>
+                    <div className="col-span-6">
+                      <input
+                        {...register(`composition.${index}.name`, {
+                          required: {
+                            value: true,
+                            message: "Name is required",
+                          },
+                        })}
+                        className="w-full h-full outline-none text-sm font-medium"
+                        placeholder="Name"
+                        readOnly={!editing}
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <input
+                        {...register(`composition.${index}.scale`, {
+                          valueAsNumber: true,
+                          validate: (value) => {
+                            if (isNaN(value)) return "Scale must be a number";
+                            else if (value <= 0)
+                              return "Scale must be greater than 0";
+                          },
+                        })}
+                        type="number"
+                        className="h-full w-10/12 outline-none text-sm font-medium"
+                        placeholder="Scale"
+                        readOnly={!editing}
+                      />
+                    </div>
+                    <div className="flex items-center">
+                      {editing && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemove(index)}
+                          className="block p-3 -ml-1 rounded-full hover:bg-gray-200 fill-red-300 hover:fill-red-600"
+                        >
+                          <FaRegTrashCan
+                            size="1.1rem"
+                            className="fill-inherit"
+                          />
+                        </button>
+                      )}
+                    </div>
+                    {errors?.composition != null &&
+                      errors.composition[index] && (
+                        <small className="text-red-600 italic mb-3 col-start-2 col-span-11">
+                          {getMessage(errors.composition[index])}
+                        </small>
+                      )}
                   </div>
-                  <div className="col-span-6">
-                    <input
-                      {...register(`composition.${index}.name`, {
-                        required: {
-                          value: true,
-                          message: "Name is required",
-                        },
-                      })}
-                      className="w-full h-full outline-none text-sm font-medium"
-                      placeholder="Name"
-                      readOnly={!editing}
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <input
-                      {...register(`composition.${index}.scale`, {
-                        valueAsNumber: true,
-                        validate: (value) => {
-                          if (isNaN(value)) return "Scale must be a number";
-                          else if (value <= 0)
-                            return "Scale must be greater than 0";
-                        },
-                      })}
-                      type="number"
-                      className="h-full w-10/12 outline-none text-sm font-medium"
-                      placeholder="Scale"
-                      readOnly={!editing}
-                    />
-                  </div>
-                  <div className="flex items-center">
-                    {editing && (
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="block p-3 -ml-1 rounded-full hover:bg-gray-200 fill-red-300 hover:fill-red-600"
-                      >
-                        <FaRegTrashCan size="1.1rem" className="fill-inherit" />
-                      </button>
-                    )}
-                  </div>
-                  {errors?.composition != null && errors.composition[index] && (
-                    <small className="text-red-600 italic mb-3 col-start-2 col-span-11">
-                      {getMessage(errors.composition[index])}
-                    </small>
-                  )}
+                  <hr className="border-gray-300" />
                 </div>
-                <hr className="border-gray-300" />
-              </div>
-            ))}
+              ))}
+            </div>
+          </form>
+          <div className="p-1 flex justify-center">
+            {editing && (
+              <button
+                className="p-3 rounded-full hover:bg-blue-gray-50 fill-blue-gray-600 hover:fill-blue-gray-900"
+                onClick={handleAdd}
+              >
+                <AiOutlinePlus size="1.3rem" className="w-5 h-5 fill-inherit" />
+              </button>
+            )}
           </div>
-        </form>
-        <div className="p-1 flex justify-center">
-          {editing && (
-            <button
-              className="p-3 rounded-full hover:bg-blue-gray-50 fill-blue-gray-600 hover:fill-blue-gray-900"
-              onClick={handleAdd}
-            >
-              <AiOutlinePlus size="1.3rem" className="w-5 h-5 fill-inherit" />
-            </button>
-          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -206,17 +249,18 @@ function ControlButton({ enableEditing, handleSave, handleCancel }) {
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState(false);
 
+  function onSuccess() {
+    setSaving(false);
+    setEditing(false);
+  }
+
+  function onFailed() {
+    setSaving(false);
+  }
+
   function onSave() {
     setSaving(true);
-    handleSave(
-      () => {
-        setSaving(false);
-        setEditing(false);
-      },
-      () => {
-        setSaving(false);
-      }
-    );
+    handleSave(onSuccess, onFailed);
   }
 
   return (
