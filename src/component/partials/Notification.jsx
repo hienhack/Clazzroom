@@ -1,41 +1,25 @@
 import {
   Button,
-  Popover,
-  PopoverContent,
-  PopoverHandler,
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
 } from "@material-tailwind/react";
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { FaBell } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
-const testNotifications = [
-  {
-    _id: "1",
-    class_name: "Software Architecture",
-    content:
-      "Hien Thai added a commnent to the review of Assignment grade composition",
-    date: "THU-20-11-2023",
-    state: "new",
-    url: "/review/23dsfasd",
-  },
-  {
-    _id: "2",
-    class_name: "Advanced web development",
-    content: "This is for testing only",
-    date: "THU-20-11-2023",
-    state: "viewed",
-    url: "/review/23dsfasd",
-  },
-];
+import { getDateFormated, getTime } from "../../utils/DateHelper";
+import { toast } from "react-toastify";
 
 function Item({ className, content, date, url, state, onClick }) {
   return (
     <Link to={url}>
       <div
-        className={`py-3 px-4 hover:bg-light-blue-100 ${
+        className={`py-3 px-4 hover:bg-light-blue-100 rounded-md ${
           state == "new" && "bg-light-blue-50"
         }`}
-        onClick={() => console.log("Clicked")}
+        onClick={onClick}
       >
         <h6
           className={`text-[0.8rem] font-medium ${
@@ -58,90 +42,108 @@ function Item({ className, content, date, url, state, onClick }) {
 }
 
 function Notification() {
-  const [notificationList, setNotificationList] = useState(testNotifications);
-  const [hasNew, setHasNew] = useState(false);
+  const [notificationList, setNotificationList] = useState([]);
+  const [noNew, setNoNew] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const loadedPageRef = useRef(0);
   const maxPagesRef = useRef(0);
 
-  function handleView(id) {
-    console.log(id);
+  function handleView(id, index) {
+    if (notificationList[index].state == "viewed") return;
+    axios
+      .post(`/notifications/${id}`, { state: "viewed" })
+      .then((res) => {
+        const newNotificationList = notificationList.slice();
+        newNotificationList[index].state = "viewed";
+        setNotificationList(newNotificationList);
+        setNoNew(noNew - 1);
+      })
+      .catch((error) => {});
   }
 
   function handleLoad() {
+    if (loadedPageRef.current >= maxPagesRef.current) return;
     setLoading(true);
-
-    // For testing
-    setTimeout(() => {
-      setLoading(false);
-      loadedPageRef.current = loadedPageRef.current + 1;
-      const newList = notificationList.slice();
-      newList.push({
-        ...testNotifications[1],
-        _id: loadedPageRef.current * 2 - 1,
-      });
-      newList.push({
-        ...testNotifications[1],
-        _id: loadedPageRef.current * 2,
-      });
-      setNotificationList(newList);
-    }, 1500);
+    axios
+      .get(`/notifications?page=${loadedPageRef.current + 1}`)
+      .then((res) => {
+        const data = res.data.data;
+        loadedPageRef.current = loadedPageRef.current + 1;
+        // remove duplicate
+        const newNotificationList = notificationList.filter(
+          (n) => !data.data.find((n2) => n2._id == n._id)
+        );
+        setNotificationList([...newNotificationList, ...data.data]);
+      })
+      .catch((error) => {
+        toast.error("Something went wrong, please try again later");
+      })
+      .finally(() => setLoading(false));
   }
 
   useEffect(() => {
-    loadedPageRef.current = 1;
-    maxPagesRef.current = 5;
-    setTimeout(() => setHasNew(true), 2000);
+    axios
+      .get("/notifications")
+      .then((res) => {
+        console.log(res.data.data);
+        const data = res.data.data;
+        loadedPageRef.current = 1;
+        maxPagesRef.current = data.total;
+        setNotificationList(data.data);
+        setHasNew(data.new && data.new > 0);
+      })
+      .catch((error) => {})
+      .finally(() => setLoading(false));
   }, []);
 
   return (
-    <Popover placement="bottom-end">
-      <PopoverHandler>
+    <Menu placement="bottom-end">
+      <MenuHandler>
         <button className="w-10 h-10 relative flex items-center justify-center rounded-full hover:bg-blue-gray-50 fill-blue-gray-300 hover:fill-blue-gray-600">
           <FaBell size="1.3rem" className="fill-inherit" />
-          {hasNew && (
+          {noNew > 0 && (
             <div className="absolute w-2 h-2 rounded-full bg-red-500 top-2 right-2"></div>
           )}
         </button>
-      </PopoverHandler>
-      <PopoverContent className="p-0">
-        <div className="w-[400px] h-[500px] overflow-y-auto ">
-          {notificationList.length == 0 && (
-            <div className="h-full w-full flex items-center justify-center">
-              <h6 className="font-semibold text-blue-gray-800">
-                There is no notification!
-              </h6>
-            </div>
-          )}
-          {notificationList.map((n) => (
-            <>
+      </MenuHandler>
+      <MenuList className="p-0 w-[400px] h-[500px] overflow-y-auto">
+        {notificationList.length == 0 && (
+          <div className="h-full w-full flex items-center justify-center">
+            <h6 className="font-semibold text-blue-gray-800">
+              There is no notification!
+            </h6>
+          </div>
+        )}
+        {notificationList.map((n, index) => (
+          <MenuItem key={n._id} className="p-0">
+            <div>
               <Item
-                key={n._id}
-                className={n.class_name}
+                className={n.class}
                 content={n.content}
                 state={n.state}
                 url={n.url}
-                date={n.date}
-                onClick={() => handleView(n._id)}
+                date={getDateFormated(n.createdAt)}
+                onClick={() => handleView(n._id, index)}
               ></Item>
-              <hr className="border-gray-300"></hr>
-            </>
-          ))}
-          {loadedPageRef.current < maxPagesRef.current && (
-            <Button
-              className="normal-case w-full"
-              variant="text"
-              color="cyan"
-              size="sm"
-              disabled={loading}
-              onClick={handleLoad}
-            >
-              {loading ? "Loading..." : "See more"}
-            </Button>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+              <hr className="border-gray-300 mx-2"></hr>
+            </div>
+          </MenuItem>
+        ))}
+        {loadedPageRef.current < maxPagesRef.current && (
+          <Button
+            className="normal-case w-full"
+            variant="text"
+            color="cyan"
+            size="sm"
+            disabled={loading}
+            onClick={handleLoad}
+          >
+            {loading ? "Loading..." : "See more"}
+          </Button>
+        )}
+      </MenuList>
+    </Menu>
   );
 }
 
