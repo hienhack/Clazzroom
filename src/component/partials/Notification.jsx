@@ -9,7 +9,7 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { FaBell } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { getDateFormated, getTime } from "../../utils/DateHelper";
+import { getDateFormated } from "../../utils/DateHelper";
 import { toast } from "react-toastify";
 
 function Item({ className, content, date, url, state, onClick }) {
@@ -45,7 +45,6 @@ function Notification() {
   const [notificationList, setNotificationList] = useState([]);
   const [noNew, setNoNew] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const loadedPageRef = useRef(0);
   const maxPagesRef = useRef(0);
 
@@ -91,7 +90,7 @@ function Notification() {
         loadedPageRef.current = 1;
         maxPagesRef.current = data.total;
         setNotificationList(data.data);
-        setHasNew(data.new && data.new > 0);
+        setNoNew(data.new);
       })
       .catch((error) => {})
       .finally(() => setLoading(false));
