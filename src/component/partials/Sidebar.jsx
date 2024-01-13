@@ -66,17 +66,18 @@ function Sidebar({ open }) {
         </MenuItem>
         <hr className="my-2"></hr>
         <div className={`grow overflow-y-auto ${!open && "hidden"}`}>
-          {classes.map((clazz) => (
-            <MenuItem
-              key={clazz?._id}
-              isChosen={false}
-              content={clazz?.class_name}
-              link={{ path: `/class/${clazz?._id}`, isEnd: false }}
-              open={open}
-            >
-              <FaGraduationCap size="1.2rem" className="fill-inherit" />
-            </MenuItem>
-          ))}
+          {classes &&
+            classes.map((clazz) => (
+              <MenuItem
+                key={clazz?._id}
+                isChosen={false}
+                content={clazz?.class_name}
+                link={{ path: `/class/${clazz?._id}`, isEnd: false }}
+                open={open}
+              >
+                <FaGraduationCap size="1.2rem" className="fill-inherit" />
+              </MenuItem>
+            ))}
         </div>
       </div>
     </div>

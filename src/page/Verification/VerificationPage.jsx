@@ -3,7 +3,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { MdEmail, MdMarkEmailRead } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 import { Button, Spinner } from "@material-tailwind/react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 function VerificationPage() {
@@ -45,8 +45,8 @@ function VerificationPage() {
         token: token,
       })
       .then((res) => {
-        user.is_verified = true;
-        setUser(user);
+        // user.is_verified = true;
+        setUser({ ...user, is_verified: true });
         setIsVerified(true);
       })
       .catch((error) => {
@@ -64,7 +64,7 @@ function VerificationPage() {
         .then((res) => {
           setUser(res.data.data);
         })
-        .catch(() => { });
+        .catch(() => {});
     }
   }
 
@@ -78,9 +78,8 @@ function VerificationPage() {
     setSending(true);
     axios
       .post("/users/resend-verification", {})
-      .then((res) => {
-      })
-      .catch((error) => { })
+      .then((res) => {})
+      .catch((error) => {})
       .finally(() => {
         setSending(false);
       });
@@ -112,7 +111,11 @@ function VerificationPage() {
           <h1 className="font-bold text-3xl my-3">
             Your email has been verified
           </h1>
-          <h6 className="mt-2 my-1">You can close this page now!</h6>
+          <Link to="/">
+            <h6 className="mt-2 my-1 hover:underline">
+              Click here to visit the app now!
+            </h6>
+          </Link>
         </>
       )}
 

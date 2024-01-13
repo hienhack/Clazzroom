@@ -144,7 +144,7 @@ function RegisterPage() {
             </div>
             <div>
               <div className="flex gap-3 items-center">
-                <h6 className="text-blue-gray-600">You are a: </h6>
+                <h6 className="text-blue-gray-600 text-sm">You are a: </h6>
                 <Radio
                   {...register("role", {
                     required: {
@@ -156,12 +156,14 @@ function RegisterPage() {
                   value={"student"}
                   color="blue"
                   label="Student"
+                  labelProps={{ className: "text-sm" }}
                 />
                 <Radio
                   {...register("role")}
                   value={"teacher"}
                   color="blue"
                   label="Teacher"
+                  labelProps={{ className: "text-sm" }}
                 />
               </div>
               <ErrorMessage

@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export default function axiosConfig() {
+export default function axiosConfig(token) {
     axios.defaults.baseURL = import.meta.env.VITE_API
-    axios.defaults.headers.common['Authorization'] = `Bearer ${localStorage.getItem('token')}`;
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     axios.defaults.timeout = 10000;
 
     // axios.interceptors.response.use((res) => {

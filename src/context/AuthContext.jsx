@@ -1,5 +1,6 @@
 import axios from "axios";
-import { createContext, useLayoutEffect, useState } from "react";
+import { createContext, useEffect, useLayoutEffect, useState } from "react";
+import useCustomLocation from "../hook/useCustomLocation";
 
 const AuthContext = createContext();
 
@@ -16,12 +17,12 @@ function AuthProvider({ children }) {
 
   function logout() {
     localStorage.removeItem("token");
-    localStorage.removeItem("currentClass");
+    localStorage.removeItem("filter");
     setToken(null);
     setUser(null);
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!token) return;
 
     axios

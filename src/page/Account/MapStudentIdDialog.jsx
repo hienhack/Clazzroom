@@ -1,3 +1,4 @@
+import { ErrorMessage } from "@hookform/error-message";
 import {
   Card,
   CardBody,
@@ -7,40 +8,34 @@ import {
   Dialog,
   Button,
 } from "@material-tailwind/react";
-import { useContext, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { ClassContext } from "../../context/ClassContext";
 import { toast } from "react-toastify";
-import { ErrorMessage } from "@hookform/error-message";
 import axios from "axios";
-import InputFormat from "../../component/common/InputFormat";
+import { AuthContext } from "../../context/AuthContext";
 
-function CreateClassForm({ open, handleOpen }) {
+function MapStudentIdDialog({ open, handleOpen }) {
   const [processing, setProcessing] = useState(false);
-  const { classList, setClassList } = useContext(ClassContext);
-  const desInputRef = useRef(null);
+  const [error, setError] = useState(null);
+  const { user, setUser } = useContext(AuthContext);
 
   function onSubmit(data) {
     setProcessing(true);
-    let description = desInputRef.current.innerHTML;
-    description = description.replaceAll("<div><br></div>", "<br>");
-    description = description.replaceAll("</div><div>", "<br>");
-    const end = description.lastIndexOf("</div>");
-    description = description.substring(0, end + 6);
-
     axios
-      .post("/classes", {
-        ...data,
-        description: description,
-      })
+      .patch("/users/profile", { ...user, student_id: data.student_id })
       .then((res) => {
-        setClassList([...classList, res.data.data]);
-        reset();
+        setUser(res.data.data);
+        toast.success("Saved student ID");
         handleOpen();
-        toast.success("Successfully created class");
       })
       .catch((error) => {
-        toast.error("Something went wrong, please try again!");
+        console.log(error);
+        if (error.response.data.statusCode == 400) {
+          setError("Student ID existed");
+        } else {
+          toast.error("Something went wrong, please try again!");
+        }
       })
       .finally(() => {
         setProcessing(false);
@@ -50,6 +45,7 @@ function CreateClassForm({ open, handleOpen }) {
   function handleCancel() {
     reset();
     handleOpen();
+    setError(null);
   }
 
   const {
@@ -58,40 +54,46 @@ function CreateClassForm({ open, handleOpen }) {
     reset,
     formState: { errors },
   } = useForm({
+    defaultValues: {
+      student_id: "",
+    },
     mode: "onSubmit",
     reValidateMode: "onBlur",
   });
 
   return (
     <Dialog
-      size="md"
+      size="sm"
       open={open}
       handler={handleOpen}
-      className="bg-transparent shadow-none"
       dismiss={{ enabled: !processing }}
+      className="bg-transparent shadow-none"
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="mx-auto p-2 w-full">
           <CardBody className="flex flex-col gap-4">
             <Typography className="mb-3" variant="h4" color="blue-gray">
-              Create a new class
+              Map student ID
             </Typography>
             <div className="flex flex-col gap-6">
+              {error && (
+                <h6 className="text-red-600 text-sm italic mb-5">{error}</h6>
+              )}
               <div>
                 <Input
-                  {...register("class_name", {
+                  {...register("student_id", {
                     required: {
                       value: true,
-                      message: "Class name is required!",
+                      message: "ID cannot be empty",
                     },
                   })}
                   className="mb-4"
                   variant="standard"
-                  label="Class name"
+                  label="Student ID"
                 ></Input>
                 <ErrorMessage
                   errors={errors}
-                  name="class_name"
+                  name="student_id"
                   render={({ message }) => (
                     <small className="text-red-600 italic mb-5">
                       {message}
@@ -99,26 +101,14 @@ function CreateClassForm({ open, handleOpen }) {
                   )}
                 />
               </div>
-              <Input
-                {...register("topic")}
-                className="mb-4"
-                variant="standard"
-                label="Topic"
-              ></Input>
-              <Input
-                {...register("room")}
-                className="mb-4"
-                variant="standard"
-                label="Room"
-              ></Input>
-              <InputFormat
-                inputRef={desInputRef}
-                height="h-52"
-                label="Class description"
-              ></InputFormat>
+              <p className="text-xs font-light mt-2 text-justify">
+                <b className="font-medium">Notice:</b> You will not be able to
+                change your student ID after it is mapped, make sure you have
+                entered the right value!
+              </p>
             </div>
           </CardBody>
-          <CardFooter className="pt-0 mt-2 h-">
+          <CardFooter className="pt-0 mt-2">
             <div className="flex justify-end items-center gap-2">
               <Button
                 type="button"
@@ -126,8 +116,8 @@ function CreateClassForm({ open, handleOpen }) {
                 variant="text"
                 color="red"
                 onClick={handleCancel}
-                className="normal-case rounded-md"
                 disabled={processing}
+                className="normal-case rounded-md"
               >
                 <span>Cancel</span>
               </Button>
@@ -139,7 +129,7 @@ function CreateClassForm({ open, handleOpen }) {
                 color="blue"
                 disabled={processing}
               >
-                <span>{processing ? "Processing..." : "Create"}</span>
+                <span>{processing ? "Saving..." : "Save"}</span>
               </Button>
             </div>
           </CardFooter>
@@ -149,4 +139,4 @@ function CreateClassForm({ open, handleOpen }) {
   );
 }
 
-export default CreateClassForm;
+export default MapStudentIdDialog;
