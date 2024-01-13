@@ -51,9 +51,9 @@ function ClassCard({ clazz }) {
       </div>
       <hr className="bg-gray-300"></hr>
       <div className="p-4 flex justify-end items-center gap-2">
-        <h6 className="text-blue-gray-600 text-xs">Grade status: </h6>
+        <h6 className="text-blue-gray-600 text-xs">Class status:</h6>
         <span className="font-medium text-xs text-light-green-600">
-          {clazz.grade_status}
+          {clazz.status == "active" ? "Active" : "Inactive"}
         </span>
       </div>
     </div>
