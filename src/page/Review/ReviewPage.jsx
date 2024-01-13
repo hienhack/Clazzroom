@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
 function ReviewPage() {
-  const [reviewList, setReviewList] = useState();
+  const [reviewList, setReviewList] = useState(null);
   const { reviewId } = useParams();
 
   return (
@@ -16,7 +16,12 @@ function ReviewPage() {
           </div>
         </div>
         <div className="grow overflow-y-auto">
-          <Outlet context={{ reviewList, setReviewList }} />
+          <Outlet
+            context={{
+              reviewList,
+              setReviewList,
+            }}
+          />
         </div>
       </div>
     </div>
