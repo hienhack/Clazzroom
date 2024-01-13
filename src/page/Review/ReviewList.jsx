@@ -165,10 +165,10 @@ function ReviewList() {
               size="sm"
               color="indigo"
               className="w-full normal-case"
-              onClick={() => setStatus("Closed")}
-              {...{ variant: filter.status == "Closed" ? "filled" : "text" }}
+              onClick={() => setStatus("Finalized")}
+              {...{ variant: filter.status == "Finalized" ? "filled" : "text" }}
             >
-              Closed
+              Finalized
             </Button>
           </div>
           <hr className="border-gray-300 mt-5 mb-6"></hr>
