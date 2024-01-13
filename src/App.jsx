@@ -36,6 +36,7 @@ import ClassGrade from "./page/Class/ClassGrade";
 import LoginSuccess from "./page/Login/LoginSuccess";
 import MoreInfoPage from "./page/Register/MoreInfoPage";
 import LoginFailed from "./page/Login/LoginFailed";
+import AccountBanned from "./page/Error/AccountBanned";
 
 function PrivatePage({ element }) {
   const { token, user, setRedirect } = useContext(AuthContext);
@@ -66,6 +67,10 @@ function App() {
 
   useLayoutEffect(() => {
     if (user == null) {
+      return;
+    }
+    if (!user.status) {
+      navigate("/errors/account-banned");
       return;
     }
     if (user.role == "not_set") {
@@ -115,10 +120,10 @@ function App() {
           element={<PublicPage element={<VerificationPage />} />}
         />
         <Route path="/welcome" element={<WelcomePage />}></Route>
-        //{" "}
         <Route path="/errors" element={<ErrorPage />}>
           <Route path="not-found" element={<NotFoundPage />}></Route>
           <Route path="forbidden" element={<ForbiddenPage />}></Route>
+          <Route path="account-banned" element={<AccountBanned />} />
         </Route>
         <Route path="/test" element={<Layout></Layout>} />
         <Route element={<Layout></Layout>}>

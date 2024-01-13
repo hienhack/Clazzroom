@@ -8,7 +8,7 @@ import axios from "axios";
 function ClassPage() {
   const [controller, setController] = useState();
   const [loading, setLoading] = useState(true);
-  const { setCurrentClass } = useContext(ClassContext);
+  const { currentClass, setCurrentClass } = useContext(ClassContext);
   const { user } = useContext(AuthContext);
   const [gradeCompositions, setGradeCompositions] = useState(null);
   const [studentList, setStudentList] = useState(null);
@@ -90,25 +90,34 @@ function ClassPage() {
 
   return (
     <div className="h-[calc(100vh-66px)] w-full">
-      <div className="flex flex-col h-full w-full">
-        <TabBar tabs={user?.role === "teacher" ? teacherTabs : studentTabs}>
-          {controller}
-        </TabBar>
-        <div className="grow overflow-y-auto">
-          <Outlet
-            context={{
-              setController,
-              loading,
-              studentList,
-              setStudentList,
-              mappedAccount,
-              setMappedAccount,
-              gradeCompositions,
-              setGradeCompositions,
-            }}
-          />
+      {currentClass && currentClass.status != "active" && (
+        <div className="mt-20">
+          <h6 className="font-medium text-blue-gray-600 text-center">
+            This class is inactive
+          </h6>
         </div>
-      </div>
+      )}
+      {(currentClass == null || currentClass.status == "active") && (
+        <div className="flex flex-col h-full w-full">
+          <TabBar tabs={user?.role === "teacher" ? teacherTabs : studentTabs}>
+            {controller}
+          </TabBar>
+          <div className="grow overflow-y-auto">
+            <Outlet
+              context={{
+                setController,
+                loading,
+                studentList,
+                setStudentList,
+                mappedAccount,
+                setMappedAccount,
+                gradeCompositions,
+                setGradeCompositions,
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
