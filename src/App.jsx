@@ -1,10 +1,16 @@
 import "./App.css";
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+  useNavigate,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import LoginPage from "./page/Login/LoginPage";
 import { AuthContext } from "./context/AuthContext";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useLayoutEffect } from "react";
 import VerificationPage from "./page/Verification/VerificationPage";
 import RegisterPage from "./page/Register/RegisterPage";
 import AccountPage from "./page/Account/AccountPage";
@@ -27,21 +33,17 @@ import ReviewList from "./page/Review/ReviewList";
 import Layout from "./layout/Layout";
 import axiosConfig from "./config/axios.config";
 import ClassGrade from "./page/Class/ClassGrade";
+import LoginSuccess from "./page/Login/LoginSuccess";
+import MoreInfoPage from "./page/Register/MoreInfoPage";
+import LoginFailed from "./page/Login/LoginFailed";
 
 function PrivatePage({ element }) {
   const { token, user, setRedirect } = useContext(AuthContext);
-  const { pathname: path } = useLocation();
   const { relativeHref } = useCustomLocation();
 
   if (token == null) {
     setRedirect(relativeHref);
     return <Navigate to="/sign-in" />;
-  } else if (user && !user.is_verified) {
-    return path == "/verification" ? (
-      <VerificationPage />
-    ) : (
-      <Navigate to="/verification" />
-    );
   }
 
   return element;
@@ -56,7 +58,30 @@ function PublicPage({ element, restricted }) {
 
 function App() {
   const { token } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
   useEffect(() => axiosConfig(token), [token]);
+
+  useLayoutEffect(() => {
+    if (user == null) {
+      return;
+    }
+    if (user.role == "not_set") {
+      if (pathname != "/sign-up/more-info") {
+        navigate("/sign-up/more-info");
+      } else {
+        return;
+      }
+    } else if (!user.is_verified) {
+      if (pathname != "/verification") {
+        navigate("/verification");
+      } else {
+        return;
+      }
+    }
+  }, [user]);
 
   return (
     <>
@@ -66,8 +91,20 @@ function App() {
           element={<PublicPage element={<LoginPage />} />}
         />
         <Route
+          path="/login/success"
+          element={<PublicPage element={<LoginSuccess />} />}
+        />
+        <Route
+          path="/login/failed"
+          element={<PublicPage element={<LoginFailed />} />}
+        />
+        <Route
           path="/sign-up"
           element={<PublicPage element={<RegisterPage />} />}
+        />
+        <Route
+          path="/sign-up/more-info"
+          element={<PrivatePage element={<MoreInfoPage />} />}
         />
         <Route
           path="/reset-password"
