@@ -14,6 +14,7 @@ function VerificationPage() {
   const [isProcessing, setIsProcessing] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState();
+  const lockRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +41,8 @@ function VerificationPage() {
     }
 
     //  Token exists
+    if (lockRef.current != null) return;
+    lockRef.current = 1;
     axios
       .post("/users/verify", {
         token: token,
