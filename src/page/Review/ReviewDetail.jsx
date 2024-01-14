@@ -283,7 +283,7 @@ function ReviewDetail() {
                     <h1 className="text-green-700 font-bold text-sm">Closed</h1>
                   ) : (
                     <>
-                      {user.role == "teacher" && (
+                      {user?.role == "teacher" && (
                         <Tooltip
                           content="Mark as finalized"
                           placement="bottom"
