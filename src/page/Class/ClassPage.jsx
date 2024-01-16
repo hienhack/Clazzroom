@@ -49,8 +49,12 @@ function ClassPage() {
         title: "Members",
       },
       {
+        to: `/class/${classId}/grade-structure`,
+        title: "Grade Structure",
+      },
+      {
         to: `/class/${classId}/grade`,
-        title: "Grade",
+        title: "Grades",
       },
     ],
     [classId]

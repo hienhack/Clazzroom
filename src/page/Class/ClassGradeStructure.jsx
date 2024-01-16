@@ -1,5 +1,12 @@
 import { Button, Tooltip } from "@material-tailwind/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FaRegEdit } from "react-icons/fa";
 import { useOutletContext, useParams } from "react-router-dom";
 import { RiDraggable } from "react-icons/ri";
@@ -11,6 +18,7 @@ import { MdClose } from "react-icons/md";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Loading from "../../component/common/Loading";
+import { AuthContext } from "../../context/AuthContext";
 
 function getMessage(messageObj) {
   let result = "";
@@ -23,6 +31,7 @@ function getMessage(messageObj) {
 function ClassGradeStructure() {
   const { setController, gradeCompositions, setGradeCompositions } =
     useOutletContext();
+  const { user } = useContext(AuthContext);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const deleteItems = useRef([]);
@@ -115,13 +124,15 @@ function ClassGradeStructure() {
   }, [gradeCompositions]);
 
   useEffect(() => {
-    setController(
-      <ControlButton
-        handleSave={handleSave}
-        handleCancel={handleCancel}
-        enableEditing={() => setEditing(true)}
-      />
-    );
+    if (user && user.role == "teacher") {
+      setController(
+        <ControlButton
+          handleSave={handleSave}
+          handleCancel={handleCancel}
+          enableEditing={() => setEditing(true)}
+        />
+      );
+    }
     return () => setController(null);
   }, [handleSave, handleCancel]);
 
