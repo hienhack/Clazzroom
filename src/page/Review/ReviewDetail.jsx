@@ -155,7 +155,7 @@ function CloseReviewDialog({ review, open, handleOpen, handleSuccess }) {
             <p className="text-xs font-light mt-2 text-justify">
               <b className="font-medium">Notice:</b> The comment feature will be
               closed and your student can not create a new review for this
-              composition after review is finalized!
+              composition after the review is finalized!
             </p>
           </div>
         </CardBody>
@@ -197,7 +197,6 @@ function ReviewDetail() {
   const [comments, setComments] = useState(null);
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(false);
-  const explanationRef = useRef(null);
   const commentRef = useRef(null);
   const { reviewId } = useParams();
   const navigate = useNavigate();
@@ -220,7 +219,15 @@ function ReviewDetail() {
       .then((res) => {
         toast.success("Comment posted");
         commentRef.current.innerHTML = "";
-        setComments([...comments, { type: "comment", content: comment }]);
+        setComments([
+          ...comments,
+          {
+            type: "comment",
+            content: comment,
+            user: { full_name: user.full_name, image: user.image },
+            createdAt: new Date().toISOString(),
+          },
+        ]);
       })
       .catch((error) => {
         toast.error("Cannot post the comment!");
@@ -258,11 +265,6 @@ function ReviewDetail() {
         }
       });
   }, []);
-
-  useEffect(() => {
-    if (review == null || explanationRef.current == null) return;
-    explanationRef.current.innerHTML = review.explanation;
-  }, [review]);
 
   return (
     <>
@@ -337,7 +339,7 @@ function ReviewDetail() {
                 <h6 className="text-sm font-medium mt-3 mb-2">Explanation</h6>
                 <div
                   className="text-sm text-blue-gray-800 font-light"
-                  ref={explanationRef}
+                  dangerouslySetInnerHTML={{ __html: review?.explanation }}
                 ></div>
               </div>
             </div>
@@ -398,12 +400,6 @@ function ReviewDetail() {
 }
 
 function Commnent({ value: comment }) {
-  const commentRef = useRef(null);
-  useEffect(() => {
-    if (comment.type != "comment" || commentRef.current == null) return;
-    commentRef.current.innerHTML = comment.content;
-  }, []);
-
   return (
     <>
       {comment.type == "comment" && (
@@ -417,7 +413,10 @@ function Commnent({ value: comment }) {
               <div className="flex items-center justify-between">
                 <h6 className="text-xs">{comment.user?.full_name}</h6>
               </div>
-              <div ref={commentRef} className="text-xs font-light"></div>
+              <div
+                dangerouslySetInnerHTML={{ __html: comment.content }}
+                className="text-xs font-light"
+              ></div>
             </div>
           </div>
           <h6 className="text-xs float-right">

@@ -12,6 +12,7 @@ import { Link, useOutletContext } from "react-router-dom";
 import { IoIosArrowDown } from "react-icons/io";
 import axios from "axios";
 import { getDateFormated } from "../../utils/DateHelper";
+import { set } from "react-hook-form";
 
 const SortLabel = {
   asc: "Ascending updated date",
@@ -133,6 +134,10 @@ function ReviewList() {
   }
 
   useEffect(() => {
+    if (filter.ignoreClass.length == classList.length) {
+      setReviewList([]);
+      return;
+    }
     setLoading(true);
     axios
       .get("/reviews", {

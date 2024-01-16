@@ -35,14 +35,12 @@ function ClassDetail() {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { loading, setController } = useOutletContext();
   const { currentClass } = useContext(ClassContext);
-  const desRef = useRef(null);
 
   useEffect(() => {
     if (currentClass == null) {
       setController(null);
       return;
     }
-    desRef.current.innerHTML = currentClass.description;
     setController(
       <ControlButton handleEditClass={() => setShowEditDialog(true)} />
     );
@@ -159,7 +157,9 @@ function ClassDetail() {
                 </h6>
                 <h6 className="font-medium">Description</h6>
                 <div
-                  ref={desRef}
+                  dangerouslySetInnerHTML={{
+                    __html: currentClass?.description,
+                  }}
                   className="text-blue-gray-900 col-span-4"
                 ></div>
               </div>
