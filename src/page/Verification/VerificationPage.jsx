@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { AuthContext } from "../../context/AuthContext";
 import { MdEmail, MdMarkEmailRead } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
@@ -18,49 +18,50 @@ function VerificationPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Waiting for user to be loaded
-    if (session_token != null && user == null) {
-      return;
-    } else if (session_token == null && token == null) {
+    if (session_token == null && token == null) {
       navigate("/sign-in");
       return;
     }
 
-    // User not logged in or logged in and not verified
-    if (user == null && token == null) {
-      navigate("/sign-in");
-      return;
-    } else if (user == null && token != null) {
-      setIsVerified(false); // default
-    } else if (user != null && token == null) {
-      setIsProcessing(false);
+    if (token != null) {
+      // Prevent call api twice in React dev mode;
+      if (lockRef.current != null) return;
+      lockRef.current = 1;
+
+      axios
+        .post("/users/verify", {
+          token: token,
+        })
+        .then((res) => {
+          setIsVerified(true);
+        })
+        .catch((error) => {
+          if (
+            error.response?.data?.statusCode == 400 ||
+            error.response?.data?.statusCode == 401
+          ) {
+            setError("This link is expired or invalid");
+          } else {
+            alert("Something went wrong, please try again later!");
+          }
+        })
+        .finally(() => {
+          setIsProcessing(false);
+          return;
+        });
+    }
+
+    if (session_token != null && user != null) {
       setIsVerified(user.is_verified);
-      return;
-    } else if (user != null && token != null) {
-      setIsVerified(false); // default
+      setIsProcessing(false);
     }
-
-    //  Token exists
-    if (lockRef.current != null) return;
-    lockRef.current = 1;
-    axios
-      .post("/users/verify", {
-        token: token,
-      })
-      .then((res) => {
-        // user.is_verified = true;
-        setUser({ ...user, is_verified: true });
-        setIsVerified(true);
-      })
-      .catch((error) => {
-        setError("This link is expired or invalid");
-      })
-      .finally(() => {
-        setIsProcessing(false);
-      });
   }, [user, session_token]);
 
   function onfocus() {
+    if (isVerified) {
+      return;
+    }
+
     if (session_token) {
       axios
         .get("/users/profile", {})
@@ -75,7 +76,7 @@ function VerificationPage() {
   useEffect(() => {
     window.addEventListener("focus", onfocus);
     return () => window.removeEventListener("focus", onfocus);
-  });
+  }, []);
 
   function handleResendBtnClick() {
     setSending(true);
