@@ -63,16 +63,18 @@ function App() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  useEffect(() => axiosConfig(token), [token]);
+  axiosConfig(token);
+
+  // useEffect(() => , [token]);
 
   useLayoutEffect(() => {
     if (user == null) {
       return;
     }
-    if (!user.status) {
-      navigate("/errors/account-banned");
-      return;
-    }
+    // if (!user.status) {
+    //   navigate("/errors/account-banned");
+    //   return;
+    // }
     if (user.role == "not_set") {
       if (pathname != "/sign-up/more-info") {
         navigate("/sign-up/more-info");
@@ -125,6 +127,10 @@ function App() {
           <Route path="forbidden" element={<ForbiddenPage />}></Route>
           <Route path="account-banned" element={<AccountBanned />} />
         </Route>
+        <Route
+          path="/join/:classId"
+          element={<PrivatePage element={<JoinClass />} />}
+        />
         <Route path="/test" element={<Layout></Layout>} />
         <Route element={<Layout></Layout>}>
           <Route
@@ -145,10 +151,7 @@ function App() {
             <Route path="" element={<ReviewList />} />
             <Route path=":reviewId" element={<ReviewDetail />} />
           </Route>
-          <Route
-            path="/join/:classId"
-            element={<PrivatePage element={<JoinClass />} />}
-          />
+
           <Route
             path="/account"
             element={<PrivatePage element={<AccountPage />} />}
