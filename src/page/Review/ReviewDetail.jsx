@@ -202,7 +202,7 @@ function ReviewDetail() {
   const navigate = useNavigate();
 
   function handleCloseSuccess() {
-    setReview({ ...review, state: "Closed" });
+    setReview({ ...review, state: "Finalized" });
     location.reload();
   }
 
@@ -281,7 +281,7 @@ function ReviewDetail() {
                   <h1 className="text-xs">{review?.grade_composition.name}</h1>
                 </div>
                 <div>
-                  {review?.state == "Closed" ? (
+                  {review?.state == "Finalized" ? (
                     <h1 className="text-green-700 font-bold text-sm">Closed</h1>
                   ) : (
                     <>

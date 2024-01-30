@@ -134,6 +134,10 @@ function ReviewList() {
   }
 
   useEffect(() => {
+    if (classList == null) {
+      return;
+    }
+
     if (filter.ignoreClass.length == classList.length) {
       setReviewList([]);
       return;
@@ -149,7 +153,7 @@ function ReviewList() {
         setLoading(false);
       })
       .catch((error) => alert("Something went wrong, please reload the page!"));
-  }, [filter]);
+  }, [filter, classList]);
 
   return (
     <div className="h-full p-6 overflow-y-scroll">

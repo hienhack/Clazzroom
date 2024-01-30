@@ -47,7 +47,7 @@ function ClassGrade() {
     const index = gradeBoard.findIndex((r) => r._id == composition._id);
     if (index == -1) return;
     const newGradeBoard = gradeBoard.slice();
-    newGradeBoard[index].state = "is_reviewed";
+    newGradeBoard[index].is_reviewed = true;
     setGradeBoard(newGradeBoard);
   }
 
